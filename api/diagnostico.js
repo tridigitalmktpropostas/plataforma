@@ -372,6 +372,7 @@ Faça uma checagem silenciosa:
 Se qualquer item falhar, corrija antes de retornar o JSON.
 `;
 
+
 const pickJSON = (text) => {
   const first = text.indexOf("{");
   const last = text.lastIndexOf("}");
@@ -387,17 +388,78 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { qa, imgs } = req.body || {};
+    const { qa, imgs, accessKey, action } = req.body || {};
 
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.SUPABASE_SECRET_KEY;
+
+    if (!supabaseUrl || !serviceKey) {
+      throw new Error(
+        "Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY na Vercel."
+      );
+    }
+
+    if (typeof accessKey !== "string" || !accessKey.trim()) {
+      return res.status(400).json({
+        erro: "Informe sua chave de acesso."
+      });
+    }
+
+    const encodedKey = encodeURIComponent(accessKey.trim());
+
+    // 1. CONSULTA A CHAVE NO SUPABASE
+    const lookupUrl =
+      `${supabaseUrl.replace(/\/$/, "")}` +
+      `/rest/v1/miv_access_keys?select=id,buyer_email,status` +
+      `&access_key=eq.${encodedKey}`;
+
+    const lookup = await fetch(lookupUrl, {
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`
+      }
+    });
+
+    if (!lookup.ok) {
+      throw new Error("Não foi possível consultar a chave no Supabase.");
+    }
+
+    const rows = await lookup.json();
+    const access = rows?.[0];
+
+    if (!access) {
+      return res.status(403).json({
+        erro: "Chave não encontrada. Confira se digitou corretamente."
+      });
+    }
+
+    if (access.status !== "available") {
+      return res.status(403).json({
+        erro: "Esta chave já foi utilizada ou não está liberada."
+      });
+    }
+
+    // 2. VALIDAÇÃO INICIAL: LIBERA O FORMULÁRIO
+    if (action === "validate") {
+      return res.status(200).json({ valid: true });
+    }
+
+    // 3. VALIDA AS RESPOSTAS
     if (!Array.isArray(qa) || qa.length > 40) {
-      return res.status(400).json({ erro: "Dados inválidos" });
+      return res.status(400).json({
+        erro: "Dados inválidos."
+      });
     }
 
     const validQA = qa
-      .filter((item) => item && typeof item.pergunta === "string")
+      .filter(
+        (item) => item && typeof item.pergunta === "string"
+      )
       .map((item) => ({
         pergunta: item.pergunta.slice(0, 300),
-        resposta: String(item.resposta ?? "").slice(0, 2500),
+        resposta: String(item.resposta ?? "").slice(0, 2500)
       }));
 
     const images = (Array.isArray(imgs) ? imgs : [])
@@ -421,92 +483,106 @@ module.exports = async (req, res) => {
         ? "\n\nAs imagens anexadas são prints do Instagram atual da pessoa. Analise somente o que estiver visível e legível."
         : "\n\nA pessoa não enviou prints do Instagram. Não afirme ter observado elementos visuais do perfil.");
 
+    // 4. SELECIONA O PROVEDOR DE IA
     const provider =
       process.env.AI_PROVIDER ||
       (process.env.OPENAI_API_KEY ? "openai" : "anthropic");
 
     let output;
 
+    // 5. GERA O DIAGNÓSTICO COM OPENAI
     if (provider === "openai") {
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("OPENAI_API_KEY não configurada na Vercel.");
       }
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: process.env.OPENAI_MODEL || "gpt-4o",
-          max_completion_tokens: 14000,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: SYSTEM },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: texto },
-                ...images.map((url) => ({
-                  type: "image_url",
-                  image_url: { url },
-                })),
-              ],
-            },
-          ],
-        }),
-      });
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: process.env.OPENAI_MODEL || "gpt-4o",
+            max_completion_tokens: 14000,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: SYSTEM },
+              {
+                role: "user",
+                content: [
+                  { type: "text", text: texto },
+                  ...images.map((url) => ({
+                    type: "image_url",
+                    image_url: { url }
+                  }))
+                ]
+              }
+            ]
+          })
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         console.error("Erro OpenAI:", data);
-        throw new Error(data.error?.message || "Falha na geração pela OpenAI.");
+        throw new Error(
+          data.error?.message || "Falha na geração pela OpenAI."
+        );
       }
 
       output = data.choices?.[0]?.message?.content;
 
     } else {
+      // 6. GERA O DIAGNÓSTICO COM ANTHROPIC
       if (!process.env.ANTHROPIC_API_KEY) {
         throw new Error("ANTHROPIC_API_KEY não configurada na Vercel.");
       }
 
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
-          max_tokens: 14000,
-          system: SYSTEM,
-          messages: [
-            {
-              role: "user",
-              content: [
-                ...images.map((url) => ({
-                  type: "image",
-                  source: {
-                    type: "base64",
-                    media_type: "image/jpeg",
-                    data: url.split(",")[1],
-                  },
-                })),
-                { type: "text", text: texto },
-              ],
-            },
-          ],
-        }),
-      });
+      const response = await fetch(
+        "https://api.anthropic.com/v1/messages",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01"
+          },
+          body: JSON.stringify({
+            model:
+              process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+            max_tokens: 14000,
+            system: SYSTEM,
+            messages: [
+              {
+                role: "user",
+                content: [
+                  ...images.map((url) => ({
+                    type: "image",
+                    source: {
+                      type: "base64",
+                      media_type: "image/jpeg",
+                      data: url.split(",")[1]
+                    }
+                  })),
+                  { type: "text", text: texto }
+                ]
+              }
+            ]
+          })
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         console.error("Erro Anthropic:", data);
-        throw new Error(data.error?.message || "Falha na geração pela Anthropic.");
+        throw new Error(
+          data.error?.message || "Falha na geração pela Anthropic."
+        );
       }
 
       output = (data.content || [])
@@ -515,11 +591,48 @@ module.exports = async (req, res) => {
         .join("");
     }
 
+    // 7. CONFERE O RETORNO DA IA
     if (!output) {
       throw new Error("A IA retornou uma resposta vazia.");
     }
 
     const result = pickJSON(output);
+
+    // 8. CONSOME A CHAVE APÓS A GERAÇÃO BEM-SUCEDIDA
+    const consumeUrl =
+      `${supabaseUrl.replace(/\/$/, "")}` +
+      `/rest/v1/miv_access_keys?access_key=eq.${encodedKey}` +
+      `&status=eq.available`;
+
+    const consume = await fetch(consumeUrl, {
+      method: "PATCH",
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation"
+      },
+      body: JSON.stringify({
+        status: "used",
+        used_at: new Date().toISOString()
+      })
+    });
+
+    if (!consume.ok) {
+      throw new Error(
+        "O relatório foi gerado, mas não foi possível confirmar o uso da chave. Entre em contato com o suporte."
+      );
+    }
+
+    const consumedRows = await consume.json();
+
+    if (!Array.isArray(consumedRows) || consumedRows.length === 0) {
+      return res.status(409).json({
+        erro: "Esta chave acabou de ser utilizada em outra sessão. Atualize a página e confira seu acesso."
+      });
+    }
+
+    // 9. DEVOLVE O RELATÓRIO
     return res.status(200).json(result);
 
   } catch (error) {
@@ -530,7 +643,8 @@ module.exports = async (req, res) => {
       detalhe:
         process.env.NODE_ENV === "development"
           ? error.message
-          : undefined,
+          : undefined
     });
   }
 };
+
