@@ -163,3 +163,395 @@ A resposta da pergunta "Em quais horários você costuma ter disponibilidade par
 - Não agende tarefas em todos os dias só para completar 30 itens.
 - Dias sem atividade são parte de uma rotina sustentável.
 - Se o dia da semana não foi selecionado, use tarefa "Sem tarefa programada — descanso ou flexibilidade", horario "Livre" e duracao "0 min".
+- Se a janela for curta, proponha uma tarefa curta compatível.
+- Se houver apenas um ou dois dias disponíveis, concentre as tarefas nesses dias e use os demais como descanso/flexibilidade.
+- Se o horário não puder ser interpretado, use "Horário a combinar", nunca invente.
+- Considere Dia 1 como segunda-feira, Dia 2 terça-feira, Dia 3 quarta-feira, Dia 4 quinta-feira, Dia 5 sexta-feira, Dia 6 sábado e Dia 7 domingo. Dia 8 reinicia na segunda-feira e assim sucessivamente até o Dia 30.
+- Distribua as tarefas em sequência lógica: organizar, ajustar perfil, preparar conteúdo, produzir, revisar, publicar, conversar com público, observar dúvidas e avaliar.
+- Considere o padrão de energia e constância relatado pela pessoa. Se ela relata sobrecarga, comece com tarefas menores e distribua o esforço.
+- Em cada tarefa, explique uma ação concreta, com verbo de ação e entrega verificável.
+- Evite "trabalhar no Instagram", "melhorar conteúdo" ou "pensar na estratégia".
+- O horário deve ser um intervalo, por exemplo "18:00–18:30", somente se estiver dentro da disponibilidade.
+- O pilar deve ser um dos cinco pilares MIV: Clareza, Credibilidade, Conteúdo, Conversão ou Consistência. Para descanso, use "Consistência".
+
+ROTINA SEMANAL
+
+Explique como manter a rotina depois dos 30 dias: frequência sustentável, blocos de produção, relacionamento, revisão e adaptação.
+Use os dias e horários informados. Não prescreva uma frequência incompatível com a disponibilidade.
+
+PRÓXIMOS PASSOS
+
+Liste de três a cinco ações em ordem de prioridade, começando pelo que mais destrava o perfil. Seja específico e realista.
+
+MOCKUP
+
+O mockup deve refletir as recomendações:
+- Nome de exibição.
+- Categoria.
+- Melhor bio em linhas curtas.
+- Botão/CTA.
+- Os mesmos destaques.
+- Nove capas de publicações.
+
+As três primeiras publicações devem corresponder exatamente às três fixadas; as outras seis devem vir das ideias adicionais.
+
+FORMATO E QUANTIDADE — OBRIGATÓRIO
+
+Responda SOMENTE com JSON válido. Não use Markdown, cercas de código, comentários ou texto antes/depois do JSON.
+Use aspas duplas em todas as chaves e strings. Não inclua vírgulas finais. Preserve quebras de linha de bios e textos longos como \\n (nunca quebras de linha literais não escapadas dentro de strings JSON).
+
+Siga exatamente esta estrutura:
+
+{
+  "resumo": "3 a 4 frases personalizadas, densas e claras que antecipem a principal leitura do diagnóstico e o caminho de resolução.",
+  "pontuacao": {
+    "clareza": 0,
+    "credibilidade": 0,
+    "conteudo": 0,
+    "conversao": 0,
+    "consistencia": 0
+  },
+  "leitura": [
+    "Parágrafo aprofundado 1: contexto do negócio, oferta, público e momento atual.",
+    "Parágrafo aprofundado 2: primeira impressão do perfil, clareza e posicionamento.",
+    "Parágrafo aprofundado 3: conteúdo, credibilidade, autoridade e prova social.",
+    "Parágrafo aprofundado 4: conversão, caminho de contato e possíveis obstáculos.",
+    "Parágrafo aprofundado 5: integração entre pessoa, rotina e execução.",
+    "Parágrafo aprofundado 6: diagnóstico central, prioridades, lógica do passo a passo e resultado esperado."
+  ],
+  "espelho": {
+    "forca_natural": "Análise detalhada com referência concreta às respostas pessoais, como a força se manifesta e como transformá-la em diferencial.",
+    "como_aproveitar_forca": "Passo a passo prático (1, 2, 3, 4...) para transformar essa força natural em argumento de valor, conteúdo e conversa comercial.",
+    "ponto_atencao": "Padrão prático identificado, evidência da resposta, possível consequência na execução ou posicionamento e leitura sem julgamento.",
+    "como_ajustar_ponto_atencao": "Passo a passo realista e gradual para reduzir o atrito desse ponto de atenção sem exigir mudança impossível.",
+    "ponto_cego_atencao": "Conexão ainda pouco percebida entre o jeito da pessoa, o negócio e o que o público percebe (ou deixa de perceber) no Instagram.",
+    "como_resolver_ponto_cego": "Passo a passo concreto para eliminar esse ponto cego no dia a dia e no perfil.",
+    "caminho_evolucao": "Plano de evolução progressivo e realista para crescer com consistência sem violentar o próprio jeito."
+  },
+  "pontos_fortes": [
+    {
+      "titulo": "Nome claro do ponto forte",
+      "evidencia": "Onde isso aparece nas respostas ou prints.",
+      "por_que_importa": "Como essa força ajuda o negócio e a percepção de valor.",
+      "passo_a_passo_aproveitamento": "Passo a passo numerado (1, 2, 3...) de como usar esse ponto forte de forma prática."
+    }
+  ],
+  "pontos_atencao": [
+    {
+      "titulo": "Problema específico",
+      "explicacao": "Explique detalhadamente o que foi observado, por que importa, como afeta o cliente e um exemplo aplicável ao negócio.",
+      "passo_a_passo": "Passo a passo numerado e detalhado (1, 2, 3, 4...) de como resolver esse problema na prática, incluindo como validar se ficou bom."
+    }
+  ],
+  "pontos_cegos_atencao": [
+    {
+      "titulo": "Ponto cego de atenção específico",
+      "tipo": "Atenção da pessoa ou Atenção do público no perfil",
+      "explicacao": "O que está passando despercebido, por que acontece e como prejudica o entendimento, a retenção ou o contato.",
+      "passo_a_passo_resolucao": "Passo a passo numerado (1, 2, 3...) para corrigir esse ponto cego de atenção."
+    }
+  ],
+  "posicionamento": "Uma frase clara e específica que sintetize o valor do negócio.",
+  "bios": [
+    "Opção 1 de bio, até 150 caracteres",
+    "Opção 2 de bio, até 150 caracteres",
+    "Opção 3 de bio, até 150 caracteres"
+  ],
+  "destaques": [
+    {
+      "emoji": "emoji",
+      "nome": "Nome curto",
+      "conteudo": "Explique o papel do destaque, o que incluir e exemplos de stories que podem entrar."
+    }
+  ],
+  "posts_fixados": [
+    {
+      "formato": "Reels, Carrossel ou Imagem",
+      "titulo": "Título/capa",
+      "ideia": "Roteiro passo a passo: gancho, desenvolvimento, exemplo específico e fechamento.",
+      "legenda": "Legenda completa pronta para adaptar/publicar, com CTA coerente."
+    }
+  ],
+  "ideias_posts": [
+    {
+      "formato": "Formato",
+      "titulo": "Título",
+      "ideia": "Desenvolvimento detalhado em 3 a 4 frases sobre o que mostrar, falar e executar.",
+      "objetivo": "Objetivo estratégico explicado em linguagem simples."
+    }
+  ],
+  "plano_30_dias": [
+    {
+      "semana": "Semana 1",
+      "foco": "Resultado de organização que a semana pretende construir, sem prometer resultado comercial.",
+      "acoes": [
+        "Ação prioritária específica",
+        "Ação prioritária específica",
+        "Ação prioritária específica"
+      ]
+    }
+  ],
+  "planner_30_dias": [
+    {
+      "dia": 1,
+      "dia_semana": "Segunda-feira",
+      "tarefa": "Ação específica, verificável, ou indicação de descanso",
+      "horario": "Intervalo dentro da disponibilidade ou Livre",
+      "duracao": "Duração compatível ou 0 min",
+      "pilar": "Clareza"
+    }
+  ],
+  "rotina_semanal": "Orientação didática, personalizada e sustentável para manter a execução após os 30 dias, com blocos, revisão e ajuste.",
+  "proximos_passos": [
+    "Ação prioritária 1 (com o que fazer e por que começar por ela)",
+    "Ação prioritária 2",
+    "Ação prioritária 3"
+  ],
+  "mockup": {
+    "nome_exibicao": "Nome como deve aparecer no perfil",
+    "categoria": "Categoria adequada",
+    "bio_linhas": ["Linha 1", "Linha 2", "Linha 3"],
+    "botao": "CTA curto",
+    "destaques": [
+      {"emoji": "emoji", "nome": "Nome"}
+    ],
+    "posts": [
+      {"capa": "Capa curta", "formato": "Reels, Carrossel ou Foto"}
+    ]
+  }
+}
+
+QUANTIDADES EXATAS:
+
+- leitura: 6 parágrafos longos e desenvolvidos.
+- espelho: preencher todos os 7 campos com análise substancial e passo a passo claro.
+- pontos_fortes: 4 a 6 objetos completos (com passo a passo para aproveitar).
+- pontos_atencao: 4 a 6 objetos completos (com explicação detalhada e passo a passo de resolução).
+- pontos_cegos_atencao: 3 a 5 objetos completos (com explicação e passo a passo de resolução).
+- bios: exatamente 3, cada uma com até 150 caracteres.
+- destaques: 5 a 6.
+- posts_fixados: exatamente 3.
+- ideias_posts: exatamente 9.
+- plano_30_dias: exatamente 4 semanas.
+- cada semana do plano macro: 3 a 4 ações.
+- planner_30_dias: exatamente 30 objetos, dia 1 ao 30, sem pular nem repetir.
+- rotina_semanal: um parágrafo completo, descritivo e específico.
+- proximos_passos: 3 a 5.
+- mockup.destaques: repetir os mesmos 5 a 6 destaques.
+- mockup.posts: exatamente 9; os 3 primeiros correspondem aos posts_fixados na mesma ordem e os outros 6 às ideias_posts.
+- pontuacao: todas as cinco notas entre 0 e 100.
+`;
+
+const pickJSON = (text) => {
+  const cleanedFence = text
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  const first = cleanedFence.indexOf("{");
+  const last = cleanedFence.lastIndexOf("}");
+  if (first < 0 || last < first) {
+    throw new Error("A IA não retornou um JSON válido.");
+  }
+
+  const rawSlice = cleanedFence.slice(first, last + 1);
+
+  try {
+    return JSON.parse(rawSlice);
+  } catch (_) {
+    let inString = false;
+    let escaped = false;
+    let fixed = "";
+
+    for (let i = 0; i < rawSlice.length; i++) {
+      const ch = rawSlice[i];
+      if (escaped) {
+        fixed += ch;
+        escaped = false;
+        continue;
+      }
+      if (ch === "\\\\") {
+        fixed += ch;
+        escaped = true;
+        continue;
+      }
+      if (ch === '"') {
+        inString = !inString;
+        fixed += ch;
+        continue;
+      }
+      if (inString && ch === "\n") {
+        fixed += "\\n";
+        continue;
+      }
+      if (inString && ch === "\r") {
+        continue;
+      }
+      if (inString && ch === "\t") {
+        fixed += "\\t";
+        continue;
+      }
+      fixed += ch;
+    }
+
+    return JSON.parse(fixed);
+  }
+};
+
+module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ erro: "Método não permitido" });
+  }
+
+  try {
+    const { qa, imgs } = req.body || {};
+
+    if (!Array.isArray(qa) || qa.length > 40) {
+      return res.status(400).json({ erro: "Dados inválidos" });
+    }
+
+    const validQA = qa
+      .filter((item) => item && typeof item.pergunta === "string")
+      .map((item) => ({
+        pergunta: item.pergunta.slice(0, 300),
+        resposta: String(item.resposta ?? "").slice(0, 2500),
+      }));
+
+    const images = (Array.isArray(imgs) ? imgs : [])
+      .filter(
+        (item) =>
+          typeof item === "string" &&
+          item.startsWith("data:image/jpeg;base64,") &&
+          item.length < 3e6
+      )
+      .slice(0, 3);
+
+    const texto =
+      "RESPOSTAS COMPLETAS DO QUESTIONÁRIO MIV:\n\n" +
+      validQA
+        .map(
+          (item, index) =>
+            `${index + 1}. PERGUNTA: ${item.pergunta}\nRESPOSTA: ${item.resposta || "Não respondida"}`
+        )
+        .join("\n\n") +
+      (images.length
+        ? "\n\nAs imagens anexadas são prints do Instagram atual da pessoa. Analise somente o que estiver visível e legível."
+        : "\n\nA pessoa não enviou prints do Instagram. Não afirme ter observado elementos visuais do perfil.");
+
+    const provider =
+      process.env.AI_PROVIDER ||
+      (process.env.OPENAI_API_KEY ? "openai" : "anthropic");
+
+    const maxTokens = Number(process.env.MAX_OUTPUT_TOKENS) || 12000;
+
+    let output;
+
+    if (provider === "openai") {
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error("OPENAI_API_KEY não configurada na Vercel.");
+      }
+
+      const model = process.env.OPENAI_MODEL || "gpt-6-luna";
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model,
+          reasoning_effort: "low",
+          max_completion_tokens: maxTokens,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: SYSTEM },
+            {
+              role: "user",
+              content: [
+                { type: "text", text: texto },
+                ...images.map((url) => ({
+                  type: "image_url",
+                  image_url: { url },
+                })),
+              ],
+            },
+          ],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Erro OpenAI:", data);
+        throw new Error(data.error?.message || "Falha na geração pela OpenAI.");
+      }
+
+      console.log("Modelo usado pela OpenAI:", data.model, "| Tokens:", data.usage);
+      output = data.choices?.[0]?.message?.content;
+    } else {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        throw new Error("ANTHROPIC_API_KEY não configurada na Vercel.");
+      }
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+          max_tokens: maxTokens,
+          system: SYSTEM,
+          messages: [
+            {
+              role: "user",
+              content: [
+                ...images.map((url) => ({
+                  type: "image",
+                  source: {
+                    type: "base64",
+                    media_type: "image/jpeg",
+                    data: url.split(",")[1],
+                  },
+                })),
+                { type: "text", text: texto },
+              ],
+            },
+          ],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Erro Anthropic:", data);
+        throw new Error(data.error?.message || "Falha na geração pela Anthropic.");
+      }
+
+      output = (data.content || [])
+        .filter((item) => item.type === "text")
+        .map((item) => item.text)
+        .join("");
+    }
+
+    if (!output) {
+      throw new Error("A IA retornou uma resposta vazia.");
+    }
+
+    const result = pickJSON(output);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Erro no diagnóstico MIV:", error);
+
+    return res.status(500).json({
+      erro: "Falha ao gerar o diagnóstico",
+      detalhe:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : undefined,
+    });
+  }
+};
