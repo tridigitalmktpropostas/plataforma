@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIV — Mínimo Instagram Viável | Tri Digital</title>
+<style>
+:root{--navy:#26213b;--ink:#262238;--muted:#777184;--green:#d6b5ff;--green-dark:#9b42c6;--line:#eee8f2;--paper:#faf7fb;--white:#fff;--soft:#f7effb;--pink:#d94b91;--orange:#f6a044;--purple:#8246c9;--shadow:0 18px 50px rgba(65,35,82,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.top{height:72px;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 max(22px,calc((100% - 1100px)/2));border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:850;letter-spacing:.11em}.mark{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:900;background:linear-gradient(135deg,#7b42c8 5%,#d94b91 58%,#f6a044 100%);box-shadow:0 5px 14px rgba(190,73,153,.2)}
+.top small{color:#8b8294;letter-spacing:.04em}
+main{max-width:1100px;margin:38px auto;padding:0 22px}.hero{background:linear-gradient(118deg,#6f3bb4 0%,#a33eaa 42%,#d94b91 73%,#f29a50 100%);color:white;border-radius:24px;padding:38px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero:after{content:"◎";position:absolute;right:28px;bottom:-105px;font-size:300px;font-weight:300;color:rgba(255,255,255,.10);letter-spacing:-.1em}
+.eyebrow{color:#ffe5f4;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+h1{font-size:clamp(36px,6vw,62px);line-height:1.02;letter-spacing:-.055em;margin:13px 0 16px;max-width:680px}
+.hero p{max-width:640px;color:#d5dee8;font-size:17px;margin:0 0 24px}.hero-foot{display:flex;gap:22px;flex-wrap:wrap;color:#d5dee8;font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.45);border-radius:99px;padding:7px 12px;color:white;font-size:12px;font-weight:700;background:rgba(255,255,255,.10)}
+.layout{display:grid;grid-template-columns:260px 1fr;gap:22px;margin-top:24px}
+.side,.panel{background:white;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.side{padding:20px;height:max-content;position:sticky;top:18px}.side h3{font-size:13px;margin:0 0 14px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.stepnav{display:flex;gap:11px;align-items:flex-start;padding:11px 9px;border-radius:12px;color:var(--muted);font-size:13px;margin:3px 0}
+.stepnav .num{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#edf0f3;font-weight:800;flex:none}
+.stepnav.active{background:#f7effb;color:#5c2c82;font-weight:750}.stepnav.active .num,.stepnav.done .num{background:linear-gradient(135deg,#8246c9,#d94b91);color:white}
+.side-note{border-top:1px solid var(--line);margin-top:15px;padding-top:15px;color:var(--muted);font-size:12px}
+.panel{padding:30px;min-height:560px}.progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:12px;font-weight:700}
+.progress{height:8px;background:#edf0f3;border-radius:99px;overflow:hidden;margin:10px 0 28px}.bar{height:100%;width:0;background:linear-gradient(90deg,#8246c9,#d94b91,#f6a044);border-radius:99px;transition:width .25s}
+h2{font-size:28px;line-height:1.15;letter-spacing:-.035em;margin:0 0 8px}.intro{color:var(--muted);margin:0 0 25px;max-width:650px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:20px}.field{display:flex;flex-direction:column;gap:7px;min-width:0}.field.full{grid-column:1/-1}
+label,.label{font-weight:700;font-size:14px}.required{color:#b34e43}.hint{font-size:12px;color:var(--muted);margin-top:-3px}
+input[type=text],input[type=number],textarea,select{width:100%;border:1px solid #d9e0e7;border-radius:11px;padding:12px 13px;background:white;color:var(--ink);outline:none;transition:.15s}
+textarea{min-height:94px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#bd75cf;box-shadow:0 0 0 3px rgba(217,75,145,.12)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choice{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:11px;padding:11px;font-size:13px;cursor:pointer}.choice:has(input:checked){border-color:#bd75cf;background:#fbf4fc}.choice input{accent-color:#8246c9;margin-top:3px}
+.ranklist{display:grid;gap:10px}.rankrow{display:grid;grid-template-columns:1fr 115px;gap:12px;align-items:center;border:1px solid var(--line);padding:10px 12px;border-radius:11px}.rankrow select{padding:9px}
+.upload{border:1.5px dashed #b9c4cf;border-radius:14px;padding:25px;text-align:center;background:#fafcfd}.upload input{max-width:100%;margin:12px auto}.preview{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.preview img{width:92px;height:92px;object-fit:cover;border-radius:9px;border:1px solid var(--line)}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.btn{border:0;border-radius:11px;padding:12px 19px;font-weight:800}.primary{background:linear-gradient(110deg,#8246c9,#d94b91 70%,#ed874f);color:white;box-shadow:0 7px 16px rgba(169,66,157,.18)}.primary:hover{filter:brightness(1.05)}.secondary{background:#f1edf4;color:var(--navy)}.textbtn{background:transparent;color:var(--muted);padding:10px}
+.save{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}.dot{width:7px;height:7px;border-radius:50%;background:#9b42c6}
+.result{display:none}.scoregrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:20px 0}.score{background:#f5f7f8;border:1px solid var(--line);border-radius:12px;padding:12px}.score strong{display:block;font-size:23px}.score span{font-size:11px;color:var(--muted)}
+.resultbox{background:#fbf7fc;border:1px solid #eee1f2;border-radius:14px;padding:17px;margin:13px 0}.resultbox h3{margin:0 0 7px;font-size:16px}.resultbox p{margin:0;color:#475568}
+.smallprint{color:var(--muted);font-size:11px;margin-top:20px}
+footer{max-width:1100px;margin:0 auto 35px;padding:0 22px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side{position:static}.side .stepnav{display:inline-flex;margin-right:3px}.side h3,.side-note{display:none}.panel{padding:22px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.scoregrid{grid-template-columns:repeat(2,1fr)}.hero{padding:28px}.rankrow{grid-template-columns:1fr 100px}}
+.ld{text-align:center;padding:70px 10px}.spin{width:54px;height:54px;border-radius:50%;margin:0 auto 22px;border:5px solid #f1e3f7;border-top-color:#d94b91;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+.sec{margin:38px 0 0}.sec h3{font-size:22px;letter-spacing:-.03em;margin:0 0 6px}.sub{color:var(--muted);margin:0 0 14px}
+.scores{display:grid;gap:12px}.sl{display:flex;justify-content:space-between;font-weight:700;font-size:14px}.sb{height:10px;background:#f1e8f5;border-radius:9px;overflow:hidden;margin-top:5px}.sb i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#8246c9,#d94b91,#f6a044);transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.card{background:#fbf7fc;border:1px solid #eee1f2;border-radius:14px;padding:16px;margin:10px 0;break-inside:avoid}.card h4{margin:6px 0;font-size:16px}.card p{margin:4px 0;color:#475568}.card ul{margin:6px 0 0;padding-left:18px}.card small{color:var(--muted)}
+.two,.grid3,.plan{display:grid;gap:12px}.two,.plan{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}.two .card,.grid3 .card,.plan .card{margin:0}
+.ok{background:#f4fbf4;border-color:#d8eed8}.warn{background:#fff8ef;border-color:#f5e0c4}.pa{margin-top:10px}
+.tag{display:inline-block;font-size:11px;font-weight:800;color:#8246c9;background:#f1e3fb;border-radius:99px;padding:3px 10px}
+.big{font-size:18px;font-weight:700;color:var(--ink)!important}.em{font-size:30px}.cap{font-style:italic;font-size:13px}.bio pre{white-space:pre-wrap;font:inherit;margin:8px 0 0}.leit p{margin:0 0 12px}
+.phone{width:340px;max-width:100%;margin:18px auto;border:8px solid #26213b;border-radius:34px;background:#fff;padding:14px;box-shadow:var(--shadow);break-inside:avoid}
+.ighd{font-weight:800;text-align:center;margin-bottom:10px}.igh{display:flex;align-items:center;gap:16px}
+.av{width:76px;height:76px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#7b42c8,#d94b91,#f6a044);flex:none}.av span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:#fff;font-size:30px;font-weight:800;color:#8246c9}
+.st{text-align:center;flex:1}.st b{display:block;font-size:17px}.st small,.igb small{color:var(--muted)}
+.igb{margin:10px 0;font-size:13px;line-height:1.4}.cta{display:block;text-align:center;background:#efe9f3;border-radius:8px;padding:7px;margin-top:10px;font-weight:700}
+.hls{display:flex;gap:12px;overflow:hidden;margin:12px 0}.hls div{text-align:center;width:56px;flex:none}.hls i{display:grid;place-items:center;font-style:normal;width:54px;height:54px;border-radius:50%;border:2px solid #d94b91;background:#faf7fb;font-size:22px}.hls small{font-size:10px;display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.gridig{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-top:1px solid var(--line);padding-top:2px}.tile{aspect-ratio:4/5;color:#fff;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font-weight:800;font-size:11px;line-height:1.2;opacity:0}.tile small{position:absolute;bottom:4px;font-size:8px;opacity:.85;font-weight:600}.tile em{position:absolute;top:3px;right:4px;font-style:normal;font-size:11px}
+.rv.in .tile{animation:pop .5s both;animation-delay:calc(var(--i)*.3s)}@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.ex{text-align:center;color:var(--muted);font-size:12px}
+.availability{display:grid;gap:10px}.availrow{display:grid;grid-template-columns:minmax(130px,1fr) 1fr 1fr;gap:10px;align-items:center;border:1px solid var(--line);padding:12px;border-radius:12px}.availday{display:flex;align-items:center;gap:8px}.availday input{accent-color:#8246c9}.availrow input[type=time]{width:100%;border:1px solid #d9e0e7;border-radius:9px;padding:9px}.availrow input:disabled{opacity:.4}.availrow input[type=time]:focus{border-color:#bd75cf;box-shadow:0 0 0 3px rgba(217,75,145,.12)}
+.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:14px}.calhead{text-align:center;font-size:10px;font-weight:800;color:var(--muted)}.calday{border:1px solid var(--line);border-radius:9px;padding:8px;min-height:125px;break-inside:avoid}.calday.done{background:#f1faf2;border-color:#cde8d0}.calday strong{display:block;font-size:12px;margin-bottom:5px}.calday p{font-size:11px;line-height:1.35;margin:4px 0}.calday small{font-size:10px;color:var(--muted)}.calcheck{display:flex;align-items:center;gap:5px;font-size:10px;margin-top:7px}.calcheck input{accent-color:#8246c9}
+@media(max-width:650px){.availrow{grid-template-columns:1fr 1fr}.availday{grid-column:1/-1}.calendar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.two,.grid3,.plan{grid-template-columns:1fr}}
+@media print{.top,.hero,footer,.actions,.side{display:none!important}body{background:#fff}.layout{display:block}.panel{box-shadow:none;border:0;padding:0}.rv{opacity:1!important;transform:none!important}.tile{opacity:1!important;animation:none!important}.sb i{transition:none}.sec h3{break-after:avoid}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><div class="mark">T</div><span>TRI DIGITAL</span></div><small>ESTRATÉGIA • CONTEÚDO • RESULTADO</small></header>
+<main>
+<section class="hero">
+ <div class="eyebrow">Uma metodologia Tri Digital</div>
+ <h1>Seu Instagram precisa do essencial para vender.</h1>
+ <p>Responda ao diagnóstico e receba um direcionamento estratégico personalizado para organizar seu perfil, comunicar melhor seu negócio e facilitar o caminho até a compra.</p>
+ <div class="hero-foot"><span class="pill">◎ MIV · Mínimo Instagram Viável</span><span>✦ Diagnóstico personalizado</span><span>✦ Direcionamento prático</span></div>
+</section>
+<div class="layout">
+<aside class="side"><h3>Sua jornada</h3><div id="nav"></div><div class="side-note">Suas respostas ficam salvas neste dispositivo enquanto você preenche. Você pode voltar e continuar depois neste mesmo navegador.</div></aside>
+<section class="panel" id="formPanel">
+ <div class="progress-head"><span id="stepLabel">Etapa 1 de 5</span><span id="progressText">0% respondido</span></div>
+ <div class="progress"><div class="bar" id="progressBar"></div></div>
+ <div id="formContent"></div>
+ <div class="actions"><div><button class="btn textbtn" id="backBtn" type="button">← Voltar</button></div><div class="save"><span class="dot"></span><span id="saveText">Salvamento automático ativado</span></div><button class="btn primary" id="nextBtn" type="button">Continuar →</button></div>
+</section>
+<section class="panel result" id="resultPanel"></section>
+</div>
+</main>
+<footer><span>© Tri Digital · MIV</span><span>Orientação estratégica · não garante resultados</span></footer>
+<script>
+const groups=[
+ {title:"Conhecendo seu negócio",desc:"Vamos começar entendendo o que você faz, o que vende e o que torna sua marca especial.",ids:[1,2,3,4,5,6,7,8,9]},
+ {title:"Conhecendo seus clientes",desc:"Agora queremos entender quem compra de você, o que procura e o que influencia sua decisão.",ids:[10,11,12,13,14,15]},
+ {title:"Como está seu Instagram hoje?",desc:"Conte como seu perfil funciona atualmente. Não existe resposta certa: queremos conhecer sua realidade.",ids:[16,17,18,19,20,21,22,23,24,25]},
+ {title:"Objetivos e prioridades",desc:"Vamos identificar o que é mais importante para seu negócio e qual ação você espera do visitante.",ids:[26,27,28,29]},
+ {title:"Mostre seu Instagram para nós",desc:"Uma imagem do perfil ajuda a complementar suas respostas. Conte também qualquer detalhe importante.",ids:[30,31]},
+ {title:"Quem está por trás do negócio?",desc:"Seu jeito de trabalhar e se comunicar também influencia a presença digital. Não existe resposta certa: queremos entender sua realidade, sem julgamentos.",ids:[32,33,34,35,36]},
+ {title:"Sua rotina e disponibilidade",desc:"Vamos distribuir as tarefas do planner nos horários em que você realmente consegue cuidar do Instagram.",ids:[37]}
+];
+const questions={
+1:{label:"Qual é o nome da sua empresa ou marca?",type:"text",ph:"Ex.: Café Aurora"},
+2:{label:"Qual é o @ do seu Instagram?",type:"text",ph:"Ex.: @cafeaurora"},
+3:{label:"Em qual segmento seu negócio atua?",type:"text",ph:"Ex.: alimentação, moda, beleza, saúde, educação..."},
+4:{label:"O que exatamente você vende?",type:"textarea",ph:"Conte quais produtos ou serviços oferece."},
+5:{label:"Seu negócio atende em qual formato?",type:"radio",opts:["Presencial","Online","Presencial e online"]},
+6:{label:"Em qual cidade ou região você atende?",type:"text",ph:"Ex.: Ilhéus e região"},
+7:{label:"Há quanto tempo seu negócio existe?",type:"radio",opts:["Ainda estou começando","Menos de 1 ano","De 1 a 3 anos","De 3 a 5 anos","Mais de 5 anos"]},
+8:{label:"O que faz seu negócio ser diferente dos concorrentes?",type:"textarea",ph:"Pense no atendimento, qualidade, experiência, especialidade ou outro diferencial."},
+9:{label:"Se você tivesse que explicar em uma frase por que alguém deveria comprar de você e não de outra empresa, o que diria?",type:"textarea",ph:"Escreva do seu jeito. Não precisa ser uma frase perfeita."},
+10:{label:"Quem é o tipo de cliente que mais costuma comprar de você?",type:"textarea",ph:"Descreva as pessoas que normalmente procuram e compram da sua empresa."},
+11:{label:"Qual é a faixa etária predominante dos seus clientes?",type:"radio",opts:["Até 17 anos","18 a 24 anos","25 a 34 anos","35 a 44 anos","45 a 54 anos","55 anos ou mais","Atendo várias faixas etárias"]},
+12:{label:"O que normalmente leva uma pessoa a procurar seu produto ou serviço?",type:"textarea",ph:"Qual desejo, necessidade ou situação faz essa pessoa procurar você?"},
+13:{label:"Quais são as principais dúvidas que seus clientes costumam ter antes de comprar?",type:"textarea",ph:"Ex.: preço, prazo, formas de pagamento, tamanho, funcionamento, resultado..."},
+14:{label:"O que você percebe que faz algumas pessoas terem interesse no seu produto ou serviço, mas acabarem não comprando?",type:"textarea",hint:"Ex.: acham caro, ficam em dúvida, dizem que vão pensar, não encontram o que procuram ou deixam de responder.",ph:"Conte situações que você já observou."},
+15:{label:"Por quais motivos você acredita que seus clientes escolhem sua empresa em vez de comprar de outra?",type:"textarea",ph:"O que seus clientes costumam elogiar ou valorizar?"},
+16:{label:"Aproximadamente quantos seguidores seu perfil possui?",type:"number",ph:"Ex.: 1250"},
+17:{label:"Com que frequência você costuma publicar no Instagram?",type:"radio",opts:["Todos os dias","De 3 a 5 vezes por semana","1 ou 2 vezes por semana","Menos de uma vez por semana","Quase nunca publico"]},
+18:{label:"Você costuma publicar Stories?",type:"radio",opts:["Todos os dias","Algumas vezes por semana","Raramente","Não publico"]},
+19:{label:"Você ou alguém da sua empresa aparece nos vídeos?",type:"radio",opts:["Sim, apareço com frequência","Às vezes","Não, mas gostaria de começar","Não e prefiro não aparecer"]},
+20:{label:"Seu perfil possui destaques organizados?",type:"radio",opts:["Sim, estão organizados","Tenho destaques, mas estão desatualizados ou desorganizados","Não tenho destaques","Não sei o que são destaques"]},
+21:{label:"Você possui três publicações estratégicas fixadas no topo do perfil?",type:"radio",opts:["Sim","Tenho publicações fixadas, mas não sei se são estratégicas","Não","Não sei como fixar publicações"]},
+22:{label:"Você costuma receber mensagens de pessoas interessadas em comprar pelo Instagram?",type:"radio",opts:["Sim, com frequência","Às vezes","Raramente","Nunca ou quase nunca"]},
+23:{label:"Por quais canais seus clientes podem comprar ou entrar em contato com sua empresa?",type:"checks",opts:["WhatsApp","Direct do Instagram","Site ou loja virtual","Loja física","Telefone","Outro canal"]},
+24:{label:"Você possui depoimentos, avaliações ou registros de clientes satisfeitos?",type:"radio",opts:["Sim, tenho vários","Tenho alguns","Ainda não tenho","Tenho, mas não publico"]},
+25:{label:"Qual é sua maior dificuldade atualmente para utilizar o Instagram no seu negócio?",type:"textarea",ph:"Ex.: não sei o que postar, tenho pouco tempo, não consigo transformar seguidores em clientes..."},
+26:{label:"Organize os objetivos abaixo por ordem de prioridade para o seu negócio.",type:"rank",hint:"Use cada número uma única vez. 1 é sua maior prioridade e 7 é sua menor prioridade.",opts:["Atrair novos clientes","Aumentar as vendas","Fortalecer a imagem da marca","Divulgar produtos e serviços","Tornar-se referência no segmento","Criar relacionamento com os clientes","Aumentar o movimento na loja ou os agendamentos"]},
+27:{label:"Qual é a principal ação que você gostaria que uma pessoa realizasse ao visitar seu Instagram?",type:"radio",opts:["Clicar no WhatsApp e solicitar atendimento","Comprar um produto","Agendar um serviço","Visitar minha loja ou estabelecimento","Conhecer meu catálogo ou meus produtos","Solicitar um orçamento","Seguir meu perfil e acompanhar minha marca","Outra ação"]},
+28:{label:"Quanto tempo você consegue dedicar ao Instagram do seu negócio?",type:"radio",opts:["Menos de 1 hora por semana","De 1 a 3 horas por semana","De 3 a 5 horas por semana","De 5 a 10 horas por semana","Mais de 10 horas por semana"]},
+29:{label:"O que você gostaria de melhorar ou conquistar com o Instagram nos próximos 30 dias?",type:"textarea",ph:"Conte o que faria você sentir que o Instagram está funcionando melhor."},
+30:{label:"Envie uma captura de tela do seu Instagram atual.",type:"upload",hint:"Envie uma imagem que mostre sua foto, bio, destaques e publicações. Você pode selecionar mais de uma imagem."},
+31:{label:"Existe alguma informação importante sobre sua empresa que você gostaria de compartilhar conosco?",type:"textarea",ph:"Conte aqui algo que ainda não apareceu nas perguntas anteriores."},
+32:{label:"O que mais pesa para você na hora de apertar publicar?",type:"checks",opts:["Medo de errar na frente de quem me conhece","Sensação de estar me autopromovendo demais","Vontade de deixar tudo perfeito antes","Receio de críticas ou julgamentos","Não sei se o conteúdo está bom ou é relevante","Não sinto dificuldade para publicar","Outro motivo"]},
+33:{label:"Nos últimos meses, o que mais fez você diminuir ou interromper sua atividade no Instagram quando a rotina apertou?",type:"checks",opts:["Falta de tempo real","Falta de clareza sobre o que dizer ou postar","Cansaço de precisar parecer sempre ativo(a)","Dificuldade de manter uma rotina","Falta de ideias","Não perceber retorno ou resposta do público","Outro motivo"]},
+34:{label:"Quando alguém próximo pede sua ajuda ou orientação sobre algo que você domina, como você costuma agir naturalmente?",type:"checks",opts:["Explico com calma e didática","Dou um direcionamento direto, um choque de realidade","Acolho, escuto e ajudo a pessoa a organizar as ideias","Vou direto para a solução e resolvo na prática","Compartilho minha experiência e exemplos","Faço perguntas para entender melhor antes de orientar","Outro jeito"]},
+35:{label:"O que no seu jeito de trabalhar ou se comunicar ajuda seu negócio — e o que, quando passa do ponto, pode atrapalhar?",type:"textarea",ph:"Ex.: sou muito cuidadosa, mas posso demorar para publicar; gosto de ajudar, mas tenho dificuldade de apresentar meu preço; tenho muitas ideias, mas começo várias ao mesmo tempo.",hint:"Pense em uma qualidade sua e em como ela pode virar um desafio quando aparece em excesso."},
+36:{label:"O que você sente que seus clientes precisam ouvir de você, mas às vezes evita dizer por medo de afastá-los ou parecer inconveniente?",type:"textarea",ph:"Pode ser uma orientação, um limite, uma explicação sobre preço, uma informação importante ou algo que ajudaria o cliente a decidir."},
+37:{label:"Em quais horários você costuma ter disponibilidade para cuidar do Instagram?",type:"availability",hint:"Marque os dias disponíveis e informe uma faixa de horário aproximada. Se variar muito, use o horário em que geralmente consegue se organizar."}
+};
+let step=0,answers=JSON.parse(localStorage.getItem("miv_answers")||"{}"),files=[];
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function save(){localStorage.setItem("miv_answers",JSON.stringify(answers));$("saveText").textContent="Respostas salvas neste dispositivo";}
+function value(id){return answers[id]??""}
+function renderNav(){
+ // Navegação progressiva: as etapas são indicativas, não clicáveis.
+ $("nav").innerHTML=groups.map((g,i)=>`<div class="stepnav ${i===step?'active':i<step?'done':''}"><span class="num">${i<step?'✓':i+1}</span><span>${g.title}</span></div>`).join("");
+}
+function fieldHTML(id){
+ const q=questions[id],v=value(id),full=[4,8,9,10,12,13,14,15,25,29,30,31,26,32,33,34,35,36,37].includes(id);
+ let body="";
+ if(q.type==="text"||q.type==="number") body=`<input id="q${id}" type="${q.type}" ${q.type==="number"?'min="0"':''} value="${esc(v)}" placeholder="${esc(q.ph||"")}" />`;
+ if(q.type==="textarea") body=`<textarea id="q${id}" placeholder="${esc(q.ph||"")}">${esc(v)}</textarea>`;
+ if(q.type==="radio") body=`<div class="choices">${q.opts.map(o=>`<label class="choice"><input type="radio" name="q${id}" value="${esc(o)}" ${v===o?'checked':''}><span>${esc(o)}</span></label>`).join("")}</div>`;
+ if(q.type==="checks") body=`<div class="choices">${q.opts.map(o=>`<label class="choice"><input type="checkbox" name="q${id}" value="${esc(o)}" ${(Array.isArray(v)&&v.includes(o))?'checked':''}><span>${esc(o)}</span></label>`).join("")}</div>`;
+ if(q.type==="rank") body=`<div class="ranklist">${q.opts.map((o,i)=>`<div class="rankrow"><span>${esc(o)}</span><select data-rank="${i}"><option value="">Prioridade</option>${[1,2,3,4,5,6,7].map(n=>`<option value="${n}" ${v&&v[o]==n?'selected':''}>${n}º</option>`).join("")}</select></div>`).join("")}</div>`;
+ if(q.type==="upload") body=`<div class="upload"><strong>Adicione imagens do seu perfil</strong><div class="hint">PNG, JPG ou WEBP · Você pode selecionar mais de uma</div><input id="q${id}" type="file" accept="image/*" multiple><div class="preview" id="preview"></div></div>`;
+  if(q.type==="availability"){
+   const days=["Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado","Domingo"];
+   const saved=v&&typeof v==="object"?v:{};
+   body=`<div class="availability">${days.map(day=>{const x=saved[day]||{};return `<div class="availrow"><div class="availday"><input type="checkbox" id="day_${day}" data-day="${day}" ${x.active?'checked':''}><label for="day_${day}">${day}</label></div><div><div class="hint">Das</div><input type="time" data-start="${day}" value="${esc(x.start||'09:00')}" ${x.active?'':'disabled'}></div><div><div class="hint">Até</div><input type="time" data-end="${day}" value="${esc(x.end||'10:00')}" ${x.active?'':'disabled'}></div></div>`}).join("")}</div><div class="hint" id="err${id}" style="color:#b34e43"></div>`;
+  }
+ return `<div class="field ${full?'full':''}"><label>${esc(q.label)} <span class="required">*</span></label>${q.hint?`<div class="hint">${esc(q.hint)}</div>`:""}${body}<div class="hint" id="err${id}" style="color:#b34e43"></div></div>`;
+}
+function render(){
+ renderNav();const g=groups[step],ids=g.ids;
+ $("stepLabel").textContent=`Etapa ${step+1} de ${groups.length}`;
+ const total=Object.keys(questions).length,done=Object.keys(answers).filter(k=>answers[k]!==""&&answers[k]!==null&&!(Array.isArray(answers[k])&&!answers[k].length)).length;
+ const pct=Math.round(done/total*100);$("progressText").textContent=`${pct}% respondido`;$("progressBar").style.width=pct+"%";
+ $("formContent").innerHTML=`<h2>${g.title}</h2><p class="intro">${g.desc}</p><div class="fields">${ids.map(fieldHTML).join("")}</div>`;
+ $("backBtn").style.visibility=step===0?"hidden":"visible";$("nextBtn").textContent=step===groups.length-1?"Gerar meu diagnóstico →":"Continuar →";
+ ids.forEach(id=>{
+  const q=questions[id],el=$("q"+id);
+  if(el){el.addEventListener("input",()=>{answers[id]=el.value;save();updateProgress()});}
+  if(q.type==="radio")document.querySelectorAll(`input[name="q${id}"]`).forEach(x=>x.addEventListener("change",()=>{answers[id]=x.value;save();updateProgress()}));
+  if(q.type==="checks")document.querySelectorAll(`input[name="q${id}"]`).forEach(x=>x.addEventListener("change",()=>{answers[id]=[...document.querySelectorAll(`input[name="q${id}"]:checked`)].map(z=>z.value);save();updateProgress()}));
+  if(q.type==="rank")document.querySelectorAll("[data-rank]").forEach(x=>x.addEventListener("change",()=>{let obj={...(answers[id]||{})};obj[q.opts[Number(x.dataset.rank)]]=x.value;answers[id]=obj;save();let vals=Object.values(obj).filter(Boolean);if(new Set(vals).size!==vals.length){x.value="";obj[q.opts[Number(x.dataset.rank)]]="";answers[id]=obj;save();alert("Cada posição deve ser utilizada apenas uma vez.");}updateProgress();}));
+  if(q.type==="upload"&&el)el.addEventListener("change",()=>{files=[...el.files];$("preview").innerHTML=files.map(f=>`<span class="hint">${esc(f.name)}</span>`).join("");answers[id]=files.map(f=>f.name);save();updateProgress()});
+   if(q.type==="availability"){
+    const syncAvailability=()=>{const obj={...(answers[id]||{})};document.querySelectorAll("[data-day]").forEach(ch=>{const day=ch.dataset.day;const start=document.querySelector(`[data-start="${day}"]`);const end=document.querySelector(`[data-end="${day}"]`);obj[day]={active:ch.checked,start:start.value,end:end.value};start.disabled=!ch.checked;end.disabled=!ch.checked;});answers[id]=obj;save();updateProgress();};
+    document.querySelectorAll("[data-day],[data-start],[data-end]").forEach(x=>x.addEventListener("change",syncAvailability));
+   }
+ });
+ if(qHasUpload(ids)&&files.length===0&&answers[30]?.length){$("preview").textContent=answers[30].join(", ")+" (selecionado anteriormente; selecione novamente para anexar nesta sessão)";}
+}
+function qHasUpload(ids){return ids.includes(30)}
+function updateProgress(){const total=Object.keys(questions).length;const done=Object.keys(answers).filter(k=>answers[k]!==""&&answers[k]!==null&&!(Array.isArray(answers[k])&&!answers[k].length)).length;let p=Math.round(done/total*100);$("progressText").textContent=`${p}% respondido`;$("progressBar").style.width=p+"%";}
+function validGroup(groupIndex){
+ const ids=groups[groupIndex].ids;let bad=[];
+ ids.forEach(id=>{
+  const q=questions[id],v=answers[id];let ok=!(v===undefined||v===null||v===""||(Array.isArray(v)&&v.length===0));
+  if(q.type==="checks")ok=Array.isArray(v)&&v.length>0;
+  if(q.type==="rank"){const vals=q.opts.map(o=>v?.[o]).filter(Boolean);ok=vals.length===7&&new Set(vals).size===7;}
+  if(q.type==="upload")ok=files.length>0;
+  if(q.type==="availability"){
+   const selected=Object.entries(v||{}).filter(([,x])=>x&&x.active);
+   ok=selected.length>0&&selected.every(([,x])=>x.start&&x.end&&x.start<x.end);
+  }
+  if(!ok)bad.push(id);
+ });
+ if(bad.length){const id=bad[0];alert(qMessage(id));return {ok:false,id};}
+ return {ok:true};
+}
+function qMessage(id){
+ if(questions[id]?.type==="availability")return "Selecione pelo menos um dia e informe horários válidos (o horário final deve ser posterior ao inicial).";
+ if(questions[id]?.type==="upload")return "Anexe pelo menos uma imagem do Instagram.";
+ return "Há perguntas obrigatórias sem resposta. Confira todas as etapas antes de gerar seu diagnóstico.";
+}
+function validAll(){
+ for(let i=0;i<groups.length;i++){
+  const result=validGroup(i);
+  if(!result.ok){step=i;render();setTimeout(()=>{const el=$("q"+result.id)||document.querySelector("[data-day]");if(el)el.focus();},0);return false;}
+ }
+ return true;
+}
+
+const L=a=>Array.isArray(a)?a:[],P=a=>L(a).map(x=>`<p>${esc(x)}</p>`).join(""),N=v=>Math.max(0,Math.min(100,Number(v)||0));
+const fmt=v=>Array.isArray(v)?v.join(", "):(v&&typeof v==="object")?Object.entries(v).map(([k,x])=>x&&typeof x==="object"&&"active"in x?(x.active?`${k}: ${x.start} às ${x.end}`:`${k}: sem disponibilidade`):x?`${x} ${k}`:"").filter(Boolean).join("; "):String(v??"");
+const sec=(t,sub,b)=>`<section class="sec rv"><h3>${t}</h3>${sub?`<p class="sub">${sub}</p>`:""}${b}</section>`;
+const li=a=>L(a).map(x=>`<li>${esc(x)}</li>`).join("");
+function shrink(f){return new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",.8))};i.onerror=()=>r(null);i.src=URL.createObjectURL(f)})}
+function loading(){
+ $("resultPanel").innerHTML=`<div class="ld"><div class="spin"></div><h2 id="ldt">Analisando suas respostas…</h2><p class="intro" style="margin:0 auto 22px">Estamos montando seu diagnóstico com calma. Isso leva cerca de 1 a 2 minutos — não feche esta página.</p><div class="progress"><div class="bar" id="ldb" style="width:5%"></div></div></div>`;
+ const m=["Lendo o que você contou sobre o negócio…","Entendendo quem é seu cliente…","Olhando seu perfil atual…","Desenhando bio e destaques…","Pensando nos posts…","Montando a prévia do seu Instagram…"];let i=0,p=5;
+ return setInterval(()=>{$("ldt").textContent=m[i++%m.length];p=Math.min(92,p+6);$("ldb").style.width=p+"%"},4500);
+}
+async function generate(){
+ $("formPanel").style.display="none";document.querySelector(".side").style.display="none";document.querySelector(".layout").style.display="block";$("resultPanel").style.display="block";scrollTo(0,0);
+ const tm=loading();
+ try{
+  const qa=Object.entries(questions).filter(([id,q])=>q.type!=="upload").map(([id,q])=>({pergunta:q.label,resposta:fmt(answers[id])}));
+  const imgs=(await Promise.all(files.slice(0,3).map(shrink))).filter(Boolean);
+  const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({qa,imgs})});
+  if(!r.ok)throw 0;const d=await r.json();if(!d||!d.resumo)throw 0;
+  clearInterval(tm);draw(d);
+ }catch(e){clearInterval(tm);$("resultPanel").innerHTML=`<div class="ld"><h2>Não conseguimos gerar agora</h2><p class="intro" style="margin:0 auto 22px">Suas respostas continuam salvas. Tente novamente em instantes.</p><button class="btn primary" onclick="generate()">Tentar novamente</button></div>`;}
+}
+function reveal(){document.querySelectorAll(".rv").forEach(e=>e.classList.add("in"));document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%");}
+function draw(d){
+ const name=(answers[1]||"").trim(),handle=(answers[2]||"").trim().replace(/^@?/,"@"),sc=d.pontuacao||{},m=d.mockup||{};
+ const lb={clareza:"Clareza",credibilidade:"Credibilidade",conteudo:"Conteúdo",conversao:"Conversão",consistencia:"Consistência"};
+ const grads=["#7b42c8,#d94b91","#d94b91,#f6a044","#26213b,#8246c9","#f6a044,#d94b91","#8246c9,#26213b","#d94b91,#7b42c8"];
+ let h=`<div class="eyebrow" style="color:#9b42c6">TRI DIGITAL · MIV · DIAGNÓSTICO ESTRATÉGICO</div><h2 class="rv">Diagnóstico de ${esc(name)}</h2><p class="intro rv">${esc(d.resumo)}</p>`;
+ h+=sec("Mapa do seu perfil","Uma leitura de 0 a 100 sobre o quanto cada área está organizada hoje. Não é uma previsão de resultado.",`<div class="scores">${Object.keys(lb).map(k=>`<div><div class="sl"><span>${lb[k]}</span><b>${N(sc[k])}</b></div><div class="sb"><i data-w="${N(sc[k])}"></i></div></div>`).join("")}</div>`);
+ h+=sec("Nossa leitura estratégica","",`<div class="leit">${P(d.leitura)}</div>`);
+ h+=sec("O que já funciona e o que merece atenção","",`<div class="two"><div class="card ok"><h4>Pontos fortes</h4><ul>${li(d.pontos_fortes)}</ul></div><div class="card warn"><h4>Pontos de atenção</h4>${L(d.pontos_atencao).map(x=>`<div class="pa"><b>${esc(x.titulo)}</b><p>${esc(x.explicacao)}</p></div>`).join("")}</div></div>`);
+ h+=sec("Posicionamento e bio","Sugestões de bio para você testar e adaptar ao seu jeito.",`<div class="card"><h4>Sua frase de posicionamento</h4><p class="big">${esc(d.posicionamento)}</p></div>${L(d.bios).map((b,i)=>`<div class="card bio"><span class="tag">Opção de bio ${i+1}</span><pre>${esc(b)}</pre></div>`).join("")}`);
+ h+=sec("Destaques sugeridos","A vitrine do seu perfil: o que a pessoa precisa encontrar sem precisar perguntar.",`<div class="grid3">${L(d.destaques).map(x=>`<div class="card"><div class="em">${esc(x.emoji)}</div><h4>${esc(x.nome)}</h4><p>${esc(x.conteudo)}</p></div>`).join("")}</div>`);
+ h+=sec("3 publicações para fixar no topo","Os primeiros conteúdos que quem chega ao seu perfil vai ver.",`<div class="grid3">${L(d.posts_fixados).map((x,i)=>`<div class="card"><span class="tag">📌 Fixado ${i+1} · ${esc(x.formato)}</span><h4>${esc(x.titulo)}</h4><p>${esc(x.ideia)}</p><p class="cap">${esc(x.legenda)}</p></div>`).join("")}</div>`);
+ h+=sec("Ideias de posts","",`<div class="grid3">${L(d.ideias_posts).map(x=>`<div class="card"><span class="tag">${esc(x.formato)}</span><h4>${esc(x.titulo)}</h4><p>${esc(x.ideia)}</p><small>Objetivo: ${esc(x.objetivo)}</small></div>`).join("")}</div>`);
+ h+=sec("Plano para os próximos 30 dias","",`<div class="plan">${L(d.plano_30_dias).map(x=>`<div class="card"><span class="tag">${esc(x.semana)}</span><h4>${esc(x.foco)}</h4><ul>${li(x.acoes)}</ul></div>`).join("")}</div><p>${esc(d.rotina_semanal)}</p>`);
+ h+=sec("Como seu perfil pode ficar","Exemplo ilustrativo com o que foi sugerido neste diagnóstico.",`<div class="phone"><div class="ighd">${esc(handle)}</div><div class="igh"><div class="av"><span>${esc((m.nome_exibicao||name).charAt(0).toUpperCase())}</span></div><div class="st"><b>9</b><small>publicações</small></div><div class="st"><b>${esc(answers[16]||0)}</b><small>seguidores</small></div></div><div class="igb"><b>${esc(m.nome_exibicao||name)}</b><br><small>${esc(m.categoria)}</small>${L(m.bio_linhas).map(x=>`<div>${esc(x)}</div>`).join("")}<span class="cta">${esc(m.botao)}</span></div><div class="hls">${L(m.destaques).slice(0,6).map(x=>`<div><i>${esc(x.emoji)}</i><small>${esc(x.nome)}</small></div>`).join("")}</div><div class="gridig">${L(m.posts).slice(0,9).map((p,i)=>`<div class="tile" style="--i:${i};background:linear-gradient(135deg,${grads[i%6]})">${i<3?"<em>📌</em>":""}<span>${esc(p.capa)}</span><small>${esc(p.formato)}</small></div>`).join("")}</div></div><p class="ex">Prévia ilustrativa. Não representa resultado garantido.</p>`);
+ h+=sec("Seus próximos passos","",`<div class="card"><ul>${li(d.proximos_passos)}</ul></div><p class="smallprint">Este diagnóstico é uma orientação estratégica baseada nas informações fornecidas por você e foi gerado com apoio de inteligência artificial. Ele não garante resultados de vendas, crescimento ou engajamento.</p>`);
+ h+=`<div class="actions"><button class="btn secondary" onclick="location.reload()">Voltar ao início</button><button class="btn primary" onclick="window.print()">Baixar relatório em PDF</button></div><p class="smallprint">Dica: na janela que abrir, escolha “Salvar como PDF” como destino.</p>`;
+ $("resultPanel").innerHTML=h;
+ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");e.target.querySelectorAll("[data-w]").forEach(b=>b.style.width=b.dataset.w+"%");io.unobserve(e.target)}}),{threshold:.12});
+ document.querySelectorAll(".rv").forEach(e=>io.observe(e));scrollTo(0,0);
+}
+addEventListener("beforeprint",reveal);
+$("backBtn").onclick=()=>{if(step>0){step--;render();}};
+$("nextBtn").onclick=()=>{
+ if(step<groups.length-1){
+  const result=validGroup(step);
+  if(!result.ok){const el=$("q"+result.id)||document.querySelector("[data-day]");if(el)el.focus();return;}
+  step++;render();
+ }else if(validAll()){
+  generate();
+ }
+};
+render();
+</script>
+</body></html>
