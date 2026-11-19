@@ -1,6 +1,5 @@
-
 // TRI DIGITAL — MIV | Diagnóstico estratégico
-// Substitua todo o conteúdo de api/diagnostico.js por este código.
+// Arquivo completo: api/diagnostico.js
 
 const SYSTEM = `
 IDENTIDADE E MISSÃO
@@ -372,7 +371,6 @@ Faça uma checagem silenciosa:
 Se qualquer item falhar, corrija antes de retornar o JSON.
 `;
 
-
 const pickJSON = (text) => {
   const first = text.indexOf("{");
   const last = text.lastIndexOf("}");
@@ -387,79 +385,122 @@ module.exports = async (req, res) => {
     return res.status(405).json({ erro: "Método não permitido" });
   }
 
-  try {
-    const { qa, imgs, accessKey, action } = req.body || {};
+  let accessKey = "";
+  let supabaseUrl = "";
+  let supabaseSecret = "";
+  let keyReserved = false;
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.SUPABASE_SECRET_KEY;
+  const supabaseHeaders = () => ({
+    apikey: supabaseSecret,
+    Authorization: `Bearer ${supabaseSecret}`,
+    "Content-Type": "application/json",
+    Prefer: "return=representation",
+  });
 
-    if (!supabaseUrl || !serviceKey) {
-      throw new Error(
-        "Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY na Vercel."
-      );
-    }
+  const updateKey = async (body, extraQuery = "") => {
+    const url =
+      `${supabaseUrl}/rest/v1/miv_access_keys` +
+      `?access_key=eq.${encodeURIComponent(accessKey)}${extraQuery}`;
 
-    if (typeof accessKey !== "string" || !accessKey.trim()) {
-      return res.status(400).json({
-        erro: "Informe sua chave de acesso."
-      });
-    }
-
-    const encodedKey = encodeURIComponent(accessKey.trim());
-
-    // 1. CONSULTA A CHAVE NO SUPABASE
-    const lookupUrl =
-      `${supabaseUrl.replace(/\/$/, "")}` +
-      `/rest/v1/miv_access_keys?select=id,buyer_email,status` +
-      `&access_key=eq.${encodedKey}`;
-
-    const lookup = await fetch(lookupUrl, {
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`
-      }
+    return fetch(url, {
+      method: "PATCH",
+      headers: supabaseHeaders(),
+      body: JSON.stringify(body),
     });
+  };
 
-    if (!lookup.ok) {
-      throw new Error("Não foi possível consultar a chave no Supabase.");
-    }
+  try {
+    const {
+      action,
+      qa,
+      imgs,
+      accessKey: submittedKey,
+    } = req.body || {};
 
-    const rows = await lookup.json();
-    const access = rows?.[0];
+    accessKey = String(submittedKey || "").trim();
 
-    if (!access) {
-      return res.status(403).json({
-        erro: "Chave não encontrada. Confira se digitou corretamente."
+    if (!accessKey) {
+      return res.status(401).json({
+        erro: "Informe sua chave de acesso.",
       });
     }
 
-    if (access.status !== "available") {
-      return res.status(403).json({
-        erro: "Esta chave já foi utilizada ou não está liberada."
+    supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+    supabaseSecret =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.SUPABASE_SECRET_KEY ||
+      "";
+
+    if (!supabaseUrl || !supabaseSecret) {
+      console.error("Configuração do Supabase ausente.");
+      return res.status(500).json({
+        erro: "Não foi possível validar a chave de acesso.",
       });
     }
 
-    // 2. VALIDAÇÃO INICIAL: LIBERA O FORMULÁRIO
+    // VALIDAÇÃO DA CHAVE: não consome nem altera o registro.
     if (action === "validate") {
+      const checkUrl =
+        `${supabaseUrl}/rest/v1/miv_access_keys` +
+        `?access_key=eq.${encodeURIComponent(accessKey)}` +
+        "&status=eq.available&select=access_key";
+
+      const checkResponse = await fetch(checkUrl, {
+        method: "GET",
+        headers: {
+          apikey: supabaseSecret,
+          Authorization: `Bearer ${supabaseSecret}`,
+        },
+      });
+
+      const checkData = await checkResponse.json().catch(() => []);
+
+      if (!checkResponse.ok) {
+        console.error("Erro ao validar chave:", checkData);
+        throw new Error("Não foi possível validar a chave no Supabase.");
+      }
+
+      if (!Array.isArray(checkData) || checkData.length === 0) {
+        return res.status(401).json({
+          erro: "Chave inválida, já utilizada ou indisponível.",
+        });
+      }
+
       return res.status(200).json({ valid: true });
     }
 
-    // 3. VALIDA AS RESPOSTAS
+    // Confere os dados antes de reservar a chave.
     if (!Array.isArray(qa) || qa.length > 40) {
-      return res.status(400).json({
-        erro: "Dados inválidos."
+      return res.status(400).json({ erro: "Dados inválidos" });
+    }
+
+    // Reserva a chave para impedir duas gerações simultâneas.
+    const reserveResponse = await updateKey(
+      { status: "processing" },
+      "&status=eq.available"
+    );
+
+    const reserveData = await reserveResponse.json().catch(() => []);
+
+    if (!reserveResponse.ok) {
+      console.error("Erro ao reservar chave:", reserveData);
+      throw new Error("Não foi possível reservar a chave de acesso.");
+    }
+
+    if (!Array.isArray(reserveData) || reserveData.length === 0) {
+      return res.status(401).json({
+        erro: "Chave inválida, já utilizada ou indisponível.",
       });
     }
 
+    keyReserved = true;
+
+    // TRATAMENTO ORIGINAL DAS RESPOSTAS
     const validQA = qa
-      .filter(
-        (item) => item && typeof item.pergunta === "string"
-      )
+      .filter((item) => item && typeof item.pergunta === "string")
       .map((item) => ({
         pergunta: item.pergunta.slice(0, 300),
-        resposta: String(item.resposta ?? "").slice(0, 2500)
+        resposta: String(item.resposta ?? "").slice(0, 2500),
       }));
 
     const images = (Array.isArray(imgs) ? imgs : [])
@@ -483,14 +524,13 @@ module.exports = async (req, res) => {
         ? "\n\nAs imagens anexadas são prints do Instagram atual da pessoa. Analise somente o que estiver visível e legível."
         : "\n\nA pessoa não enviou prints do Instagram. Não afirme ter observado elementos visuais do perfil.");
 
-    // 4. SELECIONA O PROVEDOR DE IA
     const provider =
       process.env.AI_PROVIDER ||
       (process.env.OPENAI_API_KEY ? "openai" : "anthropic");
 
     let output;
 
-    // 5. GERA O DIAGNÓSTICO COM OPENAI
+    // GERAÇÃO ORIGINAL PELA OPENAI
     if (provider === "openai") {
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("OPENAI_API_KEY não configurada na Vercel.");
@@ -502,7 +542,7 @@ module.exports = async (req, res) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
             model: process.env.OPENAI_MODEL || "gpt-4o",
@@ -516,12 +556,12 @@ module.exports = async (req, res) => {
                   { type: "text", text: texto },
                   ...images.map((url) => ({
                     type: "image_url",
-                    image_url: { url }
-                  }))
-                ]
-              }
-            ]
-          })
+                    image_url: { url },
+                  })),
+                ],
+              },
+            ],
+          }),
         }
       );
 
@@ -537,7 +577,7 @@ module.exports = async (req, res) => {
       output = data.choices?.[0]?.message?.content;
 
     } else {
-      // 6. GERA O DIAGNÓSTICO COM ANTHROPIC
+      // GERAÇÃO ORIGINAL PELA ANTHROPIC
       if (!process.env.ANTHROPIC_API_KEY) {
         throw new Error("ANTHROPIC_API_KEY não configurada na Vercel.");
       }
@@ -549,11 +589,10 @@ module.exports = async (req, res) => {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01"
+            "anthropic-version": "2023-06-01",
           },
           body: JSON.stringify({
-            model:
-              process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+            model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
             max_tokens: 14000,
             system: SYSTEM,
             messages: [
@@ -565,14 +604,14 @@ module.exports = async (req, res) => {
                     source: {
                       type: "base64",
                       media_type: "image/jpeg",
-                      data: url.split(",")[1]
-                    }
+                      data: url.split(",")[1],
+                    },
                   })),
-                  { type: "text", text: texto }
-                ]
-              }
-            ]
-          })
+                  { type: "text", text: texto },
+                ],
+              },
+            ],
+          }),
         }
       );
 
@@ -591,60 +630,62 @@ module.exports = async (req, res) => {
         .join("");
     }
 
-    // 7. CONFERE O RETORNO DA IA
     if (!output) {
       throw new Error("A IA retornou uma resposta vazia.");
     }
 
     const result = pickJSON(output);
 
-    // 8. CONSOME A CHAVE APÓS A GERAÇÃO BEM-SUCEDIDA
-    const consumeUrl =
-      `${supabaseUrl.replace(/\/$/, "")}` +
-      `/rest/v1/miv_access_keys?access_key=eq.${encodedKey}` +
-      `&status=eq.available`;
-
-    const consume = await fetch(consumeUrl, {
-      method: "PATCH",
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        "Content-Type": "application/json",
-        Prefer: "return=representation"
-      },
-      body: JSON.stringify({
+    // Consome a chave somente depois de gerar o relatório.
+    const consumeResponse = await updateKey(
+      {
         status: "used",
-        used_at: new Date().toISOString()
-      })
-    });
+        used_at: new Date().toISOString(),
+      },
+      "&status=eq.processing"
+    );
 
-    if (!consume.ok) {
+    const consumeData = await consumeResponse.json().catch(() => []);
+
+    if (
+      !consumeResponse.ok ||
+      !Array.isArray(consumeData) ||
+      consumeData.length === 0
+    ) {
+      console.error("Erro ao finalizar consumo da chave:", consumeData);
       throw new Error(
-        "O relatório foi gerado, mas não foi possível confirmar o uso da chave. Entre em contato com o suporte."
+        "O relatório foi gerado, mas não foi possível finalizar a chave."
       );
     }
 
-    const consumedRows = await consume.json();
-
-    if (!Array.isArray(consumedRows) || consumedRows.length === 0) {
-      return res.status(409).json({
-        erro: "Esta chave acabou de ser utilizada em outra sessão. Atualize a página e confira seu acesso."
-      });
-    }
-
-    // 9. DEVOLVE O RELATÓRIO
+    keyReserved = false;
     return res.status(200).json(result);
 
   } catch (error) {
     console.error("Erro no diagnóstico MIV:", error);
+
+    // Se a geração falhar, devolve a chave para nova tentativa.
+    if (keyReserved && supabaseUrl && supabaseSecret && accessKey) {
+      try {
+        const releaseResponse = await updateKey(
+          { status: "available", used_at: null },
+          "&status=eq.processing"
+        );
+
+        if (!releaseResponse.ok) {
+          console.error("Não foi possível liberar a chave após a falha.");
+        }
+      } catch (releaseError) {
+        console.error("Erro ao liberar chave:", releaseError);
+      }
+    }
 
     return res.status(500).json({
       erro: "Falha ao gerar o diagnóstico",
       detalhe:
         process.env.NODE_ENV === "development"
           ? error.message
-          : undefined
+          : undefined,
     });
   }
 };
-
