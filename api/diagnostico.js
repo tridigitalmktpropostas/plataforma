@@ -892,6 +892,9 @@ module.exports = async (req, res) => {
     }
   };
 
+  // Modelo GPT escolhido para o MIV. Mantém o endpoint Chat Completions e o JSON mode atuais.
+  const OPENAI_MODEL_ID = "gpt-6.1-terra";
+
   const callAI = async (systemPrompt, userText, images, maxTokens, stageName) => {
     let output = "";
 
@@ -910,7 +913,7 @@ module.exports = async (req, res) => {
           Authorization: "Bearer " + process.env.OPENAI_API_KEY,
         },
         body: JSON.stringify({
-          model: process.env.OPENAI_MODEL || "gpt-4o",
+          model: OPENAI_MODEL_ID,
           max_completion_tokens: maxTokens,
           response_format: { type: "json_object" },
           messages: [
@@ -1394,18 +1397,13 @@ module.exports = async (req, res) => {
           ))
         : {};
 
-    // Prefere o provedor explicitamente configurado, mas faz fallback seguro
-    // para a outra chave disponível. Isso evita selecionar Anthropic por engano
-    // quando AI_PROVIDER=anthropic está definido sem ANTHROPIC_API_KEY.
+    // O MIV prioriza a OpenAI porque o modelo GPT-6.1 Terra foi selecionado para a geração.
+    // Se a chave OpenAI não estiver disponível, mantém o fallback Anthropic para não interromper o serviço.
     const requestedProvider = String(process.env.AI_PROVIDER || "").trim().toLowerCase();
     const hasOpenAIKey = Boolean(String(process.env.OPENAI_API_KEY || "").trim());
     const hasAnthropicKey = Boolean(String(process.env.ANTHROPIC_API_KEY || "").trim());
 
-    if (requestedProvider === "openai" && hasOpenAIKey) {
-      provider = "openai";
-    } else if (requestedProvider === "anthropic" && hasAnthropicKey) {
-      provider = "anthropic";
-    } else if (hasOpenAIKey) {
+    if (hasOpenAIKey) {
       provider = "openai";
     } else if (hasAnthropicKey) {
       provider = "anthropic";
@@ -1417,7 +1415,7 @@ module.exports = async (req, res) => {
     }
 
     if (requestedProvider && requestedProvider !== provider) {
-      console.warn("AI_PROVIDER solicitado não tem chave disponível; usando o provedor configurado:", provider);
+      console.warn("AI_PROVIDER solicitado diverge da prioridade do MIV; usando o provedor disponível para o modelo selecionado:", provider);
     }
 
     // Reserva a chave uma única vez para as duas etapas.
