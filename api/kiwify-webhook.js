@@ -291,9 +291,10 @@ module.exports = async (req, res) => {
     }
 
     let isMivProduct = !configuredProductId || productId === configuredProductId;
-    // Compatibilidade caso KIWIFY_PRODUCT_ID ainda não esteja definido:
-    // produtos adicionais devem ser cadastrados no catálogo antes do primeiro webhook.
-    if (!configuredProductId && productId) {
+    if (productId && (!configuredProductId || productId !== configuredProductId)) {
+      // Produtos adicionais precisam ser cadastrados antes da venda. Mantemos
+      // o registro do catálogo mesmo depois de despublicar a oferta, para que
+      // reembolsos de compras antigas continuem sendo reconhecidos.
       const catalogLookup = await fetch(
         `${supabaseUrl}/rest/v1/miv_products?kiwify_product_id=eq.${encodeURIComponent(productId)}&select=kiwify_product_id&limit=1`,
         { headers }
@@ -303,7 +304,19 @@ module.exports = async (req, res) => {
         console.error("Não foi possível identificar o produto no catálogo MIV:", catalogRows);
         throw new Error("Não foi possível identificar o produto desta compra.");
       }
-      if (catalogRows.length > 0) isMivProduct = false;
+      const priorAdditionalPurchase = await findAdditionalPurchase(orderId);
+      const isKnownAdditionalProduct = catalogRows.length > 0 || Boolean(priorAdditionalPurchase);
+
+      if (configuredProductId) {
+        if (!isKnownAdditionalProduct) {
+          return json(res, 200, { ok: true, ignored: true, reason: "Produto adicional ainda não cadastrado no catálogo." });
+        }
+        isMivProduct = false;
+      } else {
+        // Sem KIWIFY_PRODUCT_ID, preserva o fluxo legado do MIV e separa
+        // produtos adicionais somente quando já constam do catálogo/ledger.
+        isMivProduct = !isKnownAdditionalProduct;
+      }
     }
     const isRefund =
       eventType.includes("refund") ||
