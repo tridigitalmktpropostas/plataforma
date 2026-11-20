@@ -1144,7 +1144,7 @@ module.exports = async (req, res) => {
         ),
         readStoreTable(
           "miv_customer_purchases",
-          "select=kiwify_order_id,kiwify_product_id,product_name,purchase_status,amount,currency,purchased_at,created_at&buyer_email=eq." + encodedEmail + "&order=purchased_at.desc.nullslast,created_at.desc"
+          "select=kiwify_order_id,kiwify_product_id,product_name,purchase_status,amount,currency,purchased_at,created_at,provider_access_url&buyer_email=eq." + encodedEmail + "&order=purchased_at.desc.nullslast,created_at.desc"
         ),
         readStoreTable(
           "miv_access_keys",
@@ -1152,14 +1152,17 @@ module.exports = async (req, res) => {
         ),
       ]);
 
+      const paidAddonRows = addonRows.filter((row) => row.purchase_status === "paid");
       const paidProductIds = new Set(
-        addonRows
-          .filter((row) => row.purchase_status === "paid")
-          .map((row) => String(row.kiwify_product_id || ""))
+        paidAddonRows.map((row) => String(row.kiwify_product_id || ""))
       );
       const products = catalogRows.map((product) => {
-        const owned = paidProductIds.has(String(product.kiwify_product_id || ""));
-        const accessUrl = owned ? safeStoreUrl(product.access_url) : null;
+        const productId = String(product.kiwify_product_id || "");
+        const owned = paidProductIds.has(productId);
+        const matchingPurchase = paidAddonRows.find((row) => String(row.kiwify_product_id || "") === productId);
+        const accessUrl = owned
+          ? safeStoreUrl(product.access_url) || safeStoreUrl(matchingPurchase?.provider_access_url)
+          : null;
         return {
           slug: product.slug,
           title: product.title,
@@ -1169,10 +1172,37 @@ module.exports = async (req, res) => {
           checkoutUrl: owned ? null : safeStoreUrl(product.checkout_url),
           purchased: owned,
           hasAccess: Boolean(owned && accessUrl),
-          accessUrl: accessUrl,
+          accessUrl,
           accessInstructions: owned ? String(product.access_instructions || "") : "",
         };
       });
+
+      // Se a Kiwify entregar um link individual de acesso no webhook, o produto
+      // pode ser liberado mesmo antes de sua ficha visual ser cadastrada no catálogo.
+      const cataloguedIds = new Set(catalogRows.map((product) => String(product.kiwify_product_id || "")));
+      const unlistedOwnedProducts = [];
+      const seenUnlistedIds = new Set();
+      paidAddonRows.forEach((row) => {
+        const productId = String(row.kiwify_product_id || "");
+        if (cataloguedIds.has(productId) || seenUnlistedIds.has(productId)) return;
+        seenUnlistedIds.add(productId);
+        const accessUrl = safeStoreUrl(row.provider_access_url);
+        unlistedOwnedProducts.push({
+          slug: "",
+          title: row.product_name || "Produto digital",
+          shortDescription: accessUrl
+            ? "Compra aprovada. Seu acesso individual já está liberado."
+            : "Compra reconhecida. O conteúdo será disponibilizado assim que a ficha do produto for configurada.",
+          description: "",
+          coverImageUrl: null,
+          checkoutUrl: null,
+          purchased: true,
+          hasAccess: Boolean(accessUrl),
+          accessUrl,
+          accessInstructions: "",
+        });
+      });
+      products.push(...unlistedOwnedProducts);
 
       const mivHistory = mivRows.map((row) => {
         const status = String(row.status || "");
@@ -1196,7 +1226,9 @@ module.exports = async (req, res) => {
           String(item.kiwify_product_id || "") === String(row.kiwify_product_id || "")
         );
         const paid = row.purchase_status === "paid";
-        const accessUrl = paid && product?.is_published ? safeStoreUrl(product.access_url) : null;
+        const accessUrl = paid
+          ? (safeStoreUrl(product?.access_url) || safeStoreUrl(row.provider_access_url))
+          : null;
         return {
           kind: "product",
           productId: row.kiwify_product_id,
