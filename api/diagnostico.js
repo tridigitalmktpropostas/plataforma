@@ -1472,7 +1472,7 @@ module.exports = async (req, res) => {
       form_answers_json: safeAnswersSnapshot,
       planner_progress: { completed: [] },
       privacy_acknowledged_at: generatedAt.toISOString(),
-      privacy_notice_version: "2026-11-20-v2",
+      privacy_notice_version: "2026-11-20-v3",
       research_consent: researchConsent,
       research_consent_at: researchConsent ? generatedAt.toISOString() : null,
     }, "&status=eq.processing");
