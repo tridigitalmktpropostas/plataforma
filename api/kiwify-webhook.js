@@ -12,6 +12,27 @@ const crypto = require("crypto");
 
 const json = (res, status, body) => res.status(status).json(body);
 
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+    req.on("error", reject);
+  });
+}
+
+function isValidKiwifySignature(rawBody, receivedSignature, secret) {
+  if (!rawBody || !receivedSignature || !secret) return false;
+  const expected = crypto.createHmac("sha1", secret).update(rawBody).digest("hex");
+  const received = String(receivedSignature).trim().toLowerCase();
+  const expectedBuffer = Buffer.from(expected, "hex");
+  const receivedBuffer = Buffer.from(received, "hex");
+  return (
+    receivedBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(receivedBuffer, expectedBuffer)
+  );
+}
+
 function safeTokenMatch(received, expected) {
   if (!received || !expected) return false;
   const a = Buffer.from(String(received));
@@ -34,11 +55,30 @@ module.exports = async (req, res) => {
     return json(res, 405, { ok: false, error: "Método não permitido." });
   }
 
-  const expectedToken = process.env.KIWIFY_WEBHOOK_TOKEN;
-  const receivedToken = req.query?.token || req.headers["x-miv-webhook-token"];
+  const kiwifyToken = process.env.KIWIFY_WEBHOOK_TOKEN;
+  if (!kiwifyToken) {
+    console.error("KIWIFY_WEBHOOK_TOKEN não configurado.");
+    return json(res, 500, { ok: false, error: "Webhook não configurado." });
+  }
 
-  if (!safeTokenMatch(receivedToken, expectedToken)) {
-    return json(res, 401, { ok: false, error: "Webhook não autorizado." });
+  let rawBody;
+  try {
+    rawBody = await readRawBody(req);
+  } catch (error) {
+    console.error("Não foi possível ler o corpo original do webhook:", error);
+    return json(res, 400, { ok: false, error: "Corpo do webhook inválido." });
+  }
+
+  const signature = req.query?.signature;
+  if (!isValidKiwifySignature(rawBody, signature, kiwifyToken)) {
+    return json(res, 401, { ok: false, error: "Assinatura Kiwify inválida." });
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(rawBody.toString("utf8"));
+  } catch {
+    return json(res, 400, { ok: false, error: "JSON inválido." });
   }
 
   const supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -139,7 +179,6 @@ module.exports = async (req, res) => {
   let providerAcceptedEmail = false;
 
   try {
-    const payload = req.body || {};
     const orderId = String(payload.order_id || "").trim();
     const eventType = String(payload.webhook_event_type || "").toLowerCase();
     const orderStatus = String(payload.order_status || "").toLowerCase();
@@ -275,4 +314,12 @@ module.exports = async (req, res) => {
     // Resposta não-2xx para a Kiwify poder reenviar o evento.
     return json(res, 500, { ok: false, error: "Falha no processamento do webhook." });
   }
+};
+
+
+// Vercel: desativa o parser automático para validar a assinatura sobre o corpo bruto.
+module.exports.config = {
+  api: {
+    bodyParser: false,
+  },
 };
