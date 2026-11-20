@@ -687,7 +687,7 @@ function renderCustomerStore(data){
   : '<div class="store-empty">Estamos preparando os próximos produtos da Tri Digital. Assim que forem publicados, você poderá conhecer e comprar diretamente por esta área.</div>';
  const historyHtml=purchases.length
   ? '<div class="store-history">'+purchases.map(p=>{
-     const statusLabel=p.status==="paid"?(p.hasAccess?"Acesso liberado":"Compra aprovada"):p.status==="refunded"?"Reembolsada":p.status==="chargeback"?"Chargeback":"Em processamento";
+     const statusLabel=p.status==="paid"?(p.hasAccess?"Acesso liberado":"Compra aprovada · conteúdo indisponível"):p.status==="refunded"?"Reembolsada":p.status==="chargeback"?"Chargeback":"Em processamento";
      const stateClass=p.status==="paid"?"":p.status==="refunded"||p.status==="chargeback"?"revoked":"pending";
      const amount=storeMoney(p.amount,p.currency);
      return '<div class="store-history-item"><div class="store-history-main"><strong>'+esc(p.title||"Produto digital")+'</strong><small>'+esc(storeDate(p.purchasedAt))+(p.kind==="miv"?" · MIV":" · Produto adicional")+'</small></div><div class="store-history-meta">'+(amount?'<b>'+esc(amount)+'</b>':"")+'<span class="store-state '+stateClass+'">'+esc(statusLabel)+'</span></div></div>';
