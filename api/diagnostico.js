@@ -1148,7 +1148,7 @@ module.exports = async (req, res) => {
         ),
         readStoreTable(
           "miv_access_keys",
-          "select=kiwify_order_id,status,created_at,generated_at,report_json&buyer_email=eq." + encodedEmail + "&order=created_at.desc"
+          "select=kiwify_order_id,status,created_at,generated_at&buyer_email=eq." + encodedEmail + "&order=created_at.desc"
         ),
       ]);
 
