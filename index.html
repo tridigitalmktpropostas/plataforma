@@ -64,6 +64,7 @@ footer{max-width:1100px;margin:0 auto 35px;padding:0 22px;color:var(--muted);fon
 .calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:14px}.calhead{text-align:center;font-size:10px;font-weight:800;color:var(--muted)}.calday{border:1px solid var(--line);border-radius:9px;padding:8px;min-height:125px;break-inside:avoid}.calday.done{background:#f1faf2;border-color:#cde8d0}.calday .tag{display:inline-block;margin-top:6px;font-size:9px}.calcheck{cursor:pointer}.calcheck input{width:14px;height:14px}.calday strong{display:block;font-size:12px;margin-bottom:5px}.calday p{font-size:11px;line-height:1.35;margin:4px 0}.calday small{font-size:10px;color:var(--muted)}.calcheck{display:flex;align-items:center;gap:5px;font-size:10px;margin-top:7px}.calcheck input{accent-color:#8246c9}
 @media(max-width:650px){.availrow{grid-template-columns:1fr 1fr}.availday{grid-column:1/-1}.calendar{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.two,.grid3,.plan{grid-template-columns:1fr}}
+.consent-card{margin-top:22px;padding:18px;border:1px solid #e5d9ed;border-radius:15px;background:#fbf7fd}.consent-card h3{margin:0 0 8px;font-size:16px}.consent-item{display:flex;align-items:flex-start;gap:10px;margin:12px 0;font-size:13px;line-height:1.55}.consent-item input{margin-top:4px;accent-color:#8246c9;flex:none}.consent-item a{color:#7042ab;font-weight:800}.consent-muted{font-size:11px;color:var(--muted);margin:5px 0 0}
 @media print{.top,.hero,footer,.actions,.side{display:none!important}body{background:#fff}.layout{display:block}.panel{box-shadow:none;border:0;padding:0}.rv{opacity:1!important;transform:none!important}.tile{opacity:1!important;animation:none!important}.sb i{transition:none}.sec h3{break-after:avoid}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
@@ -96,6 +97,7 @@ footer{max-width:1100px;margin:0 auto 35px;padding:0 22px;color:var(--muted);fon
 </div>
 </main>
 <footer><span>© MIV · Mínimo Instagram Viável</span><span>Uma metodologia Tri Digital · Orientação estratégica</span></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.3/html2pdf.bundle.min.js" referrerpolicy="no-referrer"></script>
 <script>
 const groups=[
  {title:"Conhecendo seu negócio",desc:"Vamos começar entendendo o que você faz, o que vende e o que torna sua marca especial.",ids:[1,2,3,4,5,6,7,8,9]},
@@ -145,10 +147,28 @@ const questions={
 36:{label:"O que você sente que seus clientes precisam ouvir de você, mas às vezes evita dizer por medo de afastá-los ou parecer inconveniente?",type:"textarea",ph:"Pode ser uma orientação, um limite, uma explicação sobre preço, uma informação importante ou algo que ajudaria o cliente a decidir."},
 37:{label:"Em quais horários você costuma ter disponibilidade para cuidar do Instagram?",type:"availability",hint:"Marque os dias disponíveis e informe uma faixa de horário aproximada. Se variar muito, use o horário em que geralmente consegue se organizar."}
 };
-let step=0,answers=JSON.parse(localStorage.getItem("miv_answers")||"{}"),files=[],validatedAccessKey="";
+let step=0,answers={},files=[],validatedAccessKey="";
+function answerStorageKey(key){
+ let hashA=2166136261,hashB=0x9e3779b9;
+ for(let i=0;i<key.length;i++){
+  const code=key.charCodeAt(i);
+  hashA=Math.imul(hashA^code,16777619);
+  hashB=Math.imul(hashB^code,2246822519);
+ }
+ return "miv_answers_"+(hashA>>>0).toString(36)+"_"+(hashB>>>0).toString(36);
+}
+function loadAnswers(key){
+ try{
+  const saved=JSON.parse(localStorage.getItem(answerStorageKey(key))||"{}");
+  return saved&&typeof saved==="object"&&!Array.isArray(saved)?saved:{};
+ }catch(error){return {};}
+}
+function clearStoredAnswers(key){
+ try{localStorage.removeItem(answerStorageKey(key));}catch(error){}
+}
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function save(){localStorage.setItem("miv_answers",JSON.stringify(answers));$("saveText").textContent="Respostas salvas neste dispositivo";}
+function save(){if(!validatedAccessKey)return;localStorage.setItem(answerStorageKey(validatedAccessKey),JSON.stringify(answers));$("saveText").textContent="Respostas salvas neste dispositivo";}
 function value(id){return answers[id]??""}
 function renderNav(){
  // Navegação progressiva: as etapas são indicativas, não clicáveis.
@@ -175,7 +195,14 @@ function render(){
  $("stepLabel").textContent=`Etapa ${step+1} de ${groups.length}`;
  const total=Object.keys(questions).length,done=Object.keys(answers).filter(k=>answers[k]!==""&&answers[k]!==null&&!(Array.isArray(answers[k])&&!answers[k].length)).length;
  const pct=Math.round(done/total*100);$("progressText").textContent=`${pct}% respondido`;$("progressBar").style.width=pct+"%";
- $("formContent").innerHTML=`<h2>${g.title}</h2><p class="intro">${g.desc}</p><div class="fields">${ids.map(fieldHTML).join("")}</div>`;
+ $("formContent").innerHTML=`<h2>${g.title}</h2><p class="intro">${g.desc}</p><div class="fields">${ids.map(fieldHTML).join("")}</div>` +
+  (step===groups.length-1 ? `
+   <section class="consent-card">
+    <h3>Privacidade e uso das informações</h3>
+    <p class="consent-muted">Leia como suas informações serão utilizadas para entregar e manter seu acompanhamento.</p>
+    <label class="consent-item"><input id="privacyAck" type="checkbox" required> <span>Li o <a href="/politica-de-privacidade.html" target="_blank" rel="noopener">Aviso de Privacidade</a> e estou ciente de que minhas respostas, diagnóstico e progresso serão armazenados para disponibilizar meu MIV e o acompanhamento por 30 dias.</span></label>
+    <label class="consent-item"><input id="researchConsent" type="checkbox"> <span><strong>Opcional:</strong> autorizo a Tri Digital a utilizar informações estruturadas e desidentificadas, sem identificadores diretos, do diagnóstico em análises internas sobre negócios e marketing. Esta escolha não altera meu acesso ao MIV e pode ser revogada pelo canal indicado no aviso.</span></label>
+   </section>` : "");
  $("backBtn").style.visibility=step===0?"hidden":"visible";$("nextBtn").textContent=step===groups.length-1?"Gerar meu diagnóstico →":"Continuar →";
  ids.forEach(id=>{
   const q=questions[id],el=$("q"+id);
@@ -390,7 +417,7 @@ async function readMivStream(response, loadingUi){
   }else if(event.type==="diagnostic"){
    loadingUi.showDiagnostic(event.data);
   }else if(event.type==="result"){
-   finalResult=event.data;
+   finalResult={data:event.data,expiresAt:event.expiresAt,progress:event.progress||{completed:[]},researchConsent:event.researchConsent===true};
   }else if(event.type==="error"){
    streamError=new Error(event.erro||"Não foi possível concluir as duas etapas do MIV.");
   }
@@ -412,13 +439,18 @@ async function readMivStream(response, loadingUi){
  buffer+=decoder.decode();
  if(buffer.trim())handleLine(buffer);
  if(streamError)throw streamError;
- if(!finalResult||!finalResult.resumo){
+ if(!finalResult||!finalResult.data||!finalResult.data.resumo){
   throw new Error("A geração terminou sem entregar o relatório completo. Sua chave será liberada para uma nova tentativa.");
  }
  return finalResult;
 }
 
 async function generate(){
+ if(step===groups.length-1 && !$('privacyAck')?.checked){
+  alert('Leia e confirme o Aviso de Privacidade para continuar.');
+  $('privacyAck')?.focus();
+  return;
+ }
  if(!validatedAccessKey){
   $("resultPanel").style.display="none";
   $("mainLayout").style.display="none";
@@ -440,11 +472,21 @@ async function generate(){
   const response=await fetch("/api/diagnostico",{
    method:"POST",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({qa,imgs,accessKey:validatedAccessKey})
+   body:JSON.stringify({
+    qa,
+    imgs,
+    accessKey:validatedAccessKey,
+    answersSnapshot:answers,
+    consent:{
+     privacyAcknowledged:$("privacyAck")?.checked===true,
+     researchConsent:$("researchConsent")?.checked===true
+    }
+   })
   });
   const result=await readMivStream(response,loadingUi);
   loadingUi.stop();
-  draw(result);
+  draw(result.data,result);
+  clearStoredAnswers(validatedAccessKey);
  }catch(error){
   loadingUi.stop();
   const diagnosisPreview=$("diagnosticPreview")?$("diagnosticPreview").innerHTML:"";
@@ -455,12 +497,81 @@ async function generate(){
    (diagnosisPreview?'<div style="padding:0 12px">'+diagnosisPreview+'</div>':"");
  }
 }
+async function downloadMivPdf(){
+ const button=$("downloadPdfBtn"),target=$("resultPanel");
+ if(button){button.disabled=true;button.textContent="Preparando PDF…";}
+ reveal();
+ try{
+  if(typeof html2pdf!=="function")throw new Error("O gerador de PDF não foi carregado.");
+  const clone=target.cloneNode(true);
+  clone.querySelectorAll(".actions").forEach(el=>el.remove());
+  clone.querySelectorAll(".smallprint").forEach(el=>{if(el.textContent.includes("O PDF será gerado"))el.remove();});
+  clone.style.width="100%";clone.style.maxWidth="1000px";clone.style.padding="18px";
+  const fileBase=(answers[1]||"diagnostico-miv").toString().normalize("NFD")
+   .replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-")
+   .replace(/^-|-$/g,"").slice(0,60)||"diagnostico-miv";
+  await html2pdf().set({
+   margin:[9,8,11,8],filename:"MIV-"+fileBase+".pdf",
+   image:{type:"jpeg",quality:.94},
+   html2canvas:{scale:1.35,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},
+   jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+   pagebreak:{mode:["css","legacy"]}
+  }).from(clone).save();
+ }catch(error){
+  console.error("Erro ao gerar PDF:",error);
+  alert("Não foi possível gerar o arquivo automaticamente neste navegador. Vamos tentar abrir a opção de impressão para salvar como PDF.");
+  try{window.print();}catch(printError){alert("Abra este acompanhamento no Chrome e tente novamente.");}
+ }finally{
+  if(button){button.disabled=false;button.textContent="Baixar relatório em PDF";}
+ }
+}
 function reveal(){document.querySelectorAll(".rv").forEach(e=>e.classList.add("in"));document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%");}
-function draw(d){
+let plannerSaveQueue=Promise.resolve();
+let activeAccessExpiresAt=null;
+async function revokeResearchConsent(){
+ if(!validatedAccessKey)return;
+ if(!confirm("Deseja revogar a autorização opcional de pesquisa? Isso removerá o registro de pesquisa vinculado à sua chave. Seu relatório e seu planner continuarão disponíveis normalmente."))return;
+ const card=$("researchConsentStatus");
+ const button=card?.querySelector("button");
+ if(button){button.disabled=true;button.textContent="Registrando revogação…";}
+ try{
+  const response=await fetch("/api/diagnostico",{
+   method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({action:"revoke_research",accessKey:validatedAccessKey})
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||data.revoked!==true)throw new Error(data.erro||"Não foi possível registrar a revogação.");
+  if(card)card.remove();
+  alert("Sua autorização de pesquisa foi revogada. Seu MIV continua disponível normalmente.");
+ }catch(error){
+  alert(error.message||"Não foi possível registrar a revogação.");
+  if(button){button.disabled=false;button.textContent="Revogar autorização de pesquisa";}
+ }
+}
+async function savePlannerProgress(completed){
+ plannerSaveQueue=plannerSaveQueue.then(async()=>{
+  const response=await fetch("/api/diagnostico",{
+   method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({action:"save_progress",accessKey:validatedAccessKey,completed})
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||data.saved!==true)throw new Error(data.erro||"Não foi possível salvar o progresso.");
+  return data;
+ }).catch(error=>{
+  alert(error.message||"Não foi possível salvar seu progresso. Verifique a conexão e tente novamente.");
+ });
+ return plannerSaveQueue;
+}
+function draw(d,session={}){
+ const plannerProgress=session.progress||{completed:[]};
+ activeAccessExpiresAt=session.expiresAt||null;
+ const hasResearchConsent=session.researchConsent===true;
  const name=(answers[1]||"").trim(),handle=(answers[2]||"").trim().replace(/^@?/,"@"),sc=d.pontuacao||{},m=d.mockup||{};
  const lb={clareza:"Clareza",credibilidade:"Credibilidade",conteudo:"Conteúdo",conversao:"Conversão",consistencia:"Consistência"};
  const grads=["#7b42c8,#d94b91","#d94b91,#f6a044","#26213b,#8246c9","#f6a044,#d94b91","#8246c9,#26213b","#d94b91,#7b42c8"];
  let h=`<div class="eyebrow" style="color:#9b42c6">MIV · MÍNIMO INSTAGRAM VIÁVEL · DIAGNÓSTICO ESTRATÉGICO</div><h2 class="rv">Diagnóstico de ${esc(name)}</h2><p class="intro rv">${esc(d.resumo)}</p>`;
+ if(activeAccessExpiresAt){const expiryText=new Date(activeAccessExpiresAt).toLocaleDateString("pt-BR");h+=`<div class="resultbox"><strong>Seu acompanhamento está ativo até ${esc(expiryText)}.</strong><p>Suas marcações do planner ficam salvas durante esse período.</p></div>`;}
+ if(hasResearchConsent){h+=`<div class="resultbox" id="researchConsentStatus"><strong>Autorização de pesquisa ativa</strong><p>Você autorizou o uso de informações categóricas sem identificadores diretos em análises internas da Tri Digital. Essa autorização é opcional.</p><button class="btn secondary" type="button" onclick="revokeResearchConsent()">Revogar autorização de pesquisa</button></div>`;}
  h+=sec("Mapa do seu perfil","Uma leitura de 0 a 100 sobre o quanto cada área está organizada hoje. Não é uma previsão de resultado.",`<div class="scores">${Object.keys(lb).map(k=>`<div><div class="sl"><span>${lb[k]}</span><b>${N(sc[k])}</b></div><div class="sb"><i data-w="${N(sc[k])}"></i></div></div>`).join("")}</div>`);
  h+=sec("Nossa leitura estratégica","",`<div class="leit">${P(d.leitura)}</div>`);
  const e=d.espelho||{};
@@ -478,9 +589,20 @@ function draw(d){
 
  h+=sec("Como seu perfil pode ficar","Exemplo ilustrativo com o que foi sugerido neste diagnóstico.",`<div class="phone"><div class="ighd">${esc(handle)}</div><div class="igh"><div class="av"><span>${esc((m.nome_exibicao||name).charAt(0).toUpperCase())}</span></div><div class="st"><b>9</b><small>publicações</small></div><div class="st"><b>${esc(answers[16]||0)}</b><small>seguidores</small></div></div><div class="igb"><b>${esc(m.nome_exibicao||name)}</b><br><small>${esc(m.categoria)}</small>${L(m.bio_linhas).map(x=>`<div>${esc(x)}</div>`).join("")}<span class="cta">${esc(m.botao)}</span></div><div class="hls">${L(m.destaques).slice(0,6).map(x=>`<div><i>${esc(x.emoji)}</i><small>${esc(x.nome)}</small></div>`).join("")}</div><div class="gridig">${L(m.posts).slice(0,9).map((p,i)=>`<div class="tile" style="--i:${i};background:linear-gradient(135deg,${grads[i%6]})">${i<3?"<em>📌</em>":""}<span>${esc(p.capa)}</span><small>${esc(p.formato)}</small></div>`).join("")}</div></div><p class="ex">Prévia ilustrativa. Não representa resultado garantido.</p>`);
  h+=sec("Seus próximos passos","",`<div class="card"><ul>${li(d.proximos_passos)}</ul></div><p class="smallprint">Este diagnóstico é uma orientação estratégica baseada nas informações fornecidas por você e foi gerado com apoio de inteligência artificial. Ele não garante resultados de vendas, crescimento ou engajamento.</p>`);
- h+=`<div class="actions"><button class="btn secondary" onclick="location.reload()">Voltar ao início</button><button class="btn primary" onclick="window.print()">Baixar relatório em PDF</button></div><p class="smallprint">Dica: na janela que abrir, escolha “Salvar como PDF” como destino.</p>`;
+ h+=`<div class="actions"><button class="btn secondary" onclick="location.reload()">Sair do acompanhamento</button><button class="btn primary" id="downloadPdfBtn" onclick="downloadMivPdf()">Baixar relatório em PDF</button></div><p class="smallprint">O PDF será gerado no seu dispositivo. Em celulares, o arquivo pode aparecer nos downloads do navegador.</p>`;
  $("resultPanel").innerHTML=h;
- document.querySelectorAll("[data-planner-check]").forEach(ch=>ch.addEventListener("change",()=>{const card=ch.closest(".calday");if(card)card.classList.toggle("done",ch.checked);}));
+ const completedSet=new Set((plannerProgress.completed||[]).map(Number));
+ document.querySelectorAll("[data-planner-check]").forEach(ch=>{
+  const index=Number(ch.dataset.plannerCheck);
+  ch.checked=completedSet.has(index);
+  const card=ch.closest(".calday");
+  if(card)card.classList.toggle("done",ch.checked);
+  ch.addEventListener("change",()=>{
+   if(ch.checked)completedSet.add(index);else completedSet.delete(index);
+   if(card)card.classList.toggle("done",ch.checked);
+   savePlannerProgress([...completedSet]);
+  });
+ });
  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");e.target.querySelectorAll("[data-w]").forEach(b=>b.style.width=b.dataset.w+"%");io.unobserve(e.target)}}),{threshold:.12});
  document.querySelectorAll(".rv").forEach(e=>io.observe(e));scrollTo(0,0);
 }
@@ -488,9 +610,7 @@ addEventListener("beforeprint",reveal);
 
 // Valida a chave no servidor antes de liberar o questionário.
 async function validateAccess(){
- const input=$("accessKeyInput");
- const button=$("accessBtn");
- const error=$("accessError");
+ const input=$("accessKeyInput"),button=$("accessBtn"),error=$("accessError");
  const key=(input.value||"").trim();
  error.textContent="";
  if(!key){error.textContent="Digite a chave de acesso recebida por e-mail.";input.focus();return;}
@@ -499,19 +619,45 @@ async function validateAccess(){
  button.textContent="Validando…";
  try{
   const response=await fetch("/api/diagnostico",{
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
+   method:"POST",headers:{"Content-Type":"application/json"},
    body:JSON.stringify({action:"validate",accessKey:key})
   });
   const data=await response.json().catch(()=>({}));
-  if(!response.ok||data.valid!==true){throw new Error(data.erro||"Não foi possível validar sua chave. Confira e tente novamente.");}
+  if(!response.ok||data.valid!==true)throw new Error(data.erro||"Não foi possível validar sua chave. Confira e tente novamente.");
   validatedAccessKey=key;
+  try{localStorage.removeItem("miv_answers");}catch(storageError){}
   $("accessGate").style.display="none";
   $("mainLayout").style.display="grid";
-  render();
+  if(data.hasReport){
+   button.textContent="Abrindo seu acompanhamento…";
+   const resumeResponse=await fetch("/api/diagnostico",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"resume",accessKey:key})
+   });
+   const resume=await resumeResponse.json().catch(()=>({}));
+   if(!resumeResponse.ok||!resume.report)throw new Error(resume.erro||"Não foi possível abrir seu relatório salvo.");
+   answers=resume.answers||{};
+   clearStoredAnswers(key);
+   $("formPanel").style.display="none";
+   document.querySelector(".side").style.display="none";
+   $("resultPanel").style.display="block";
+   document.querySelector(".layout").style.display="block";
+   draw(resume.report,{expiresAt:resume.expiresAt,progress:resume.progress||{completed:[]},researchConsent:resume.researchConsent===true});
+  }else{
+   answers=loadAnswers(key);
+   step=0;
+   files=[];
+   $("formPanel").style.display="block";
+   $("resultPanel").style.display="none";
+   document.querySelector(".side").style.display="";
+   render();
+  }
   scrollTo({top:0,behavior:"smooth"});
  }catch(err){
+  validatedAccessKey="";
   error.textContent=err.message||"Não foi possível validar sua chave. Tente novamente.";
+  $("accessGate").style.display="block";
+  $("mainLayout").style.display="none";
   input.focus();
  }finally{
   button.disabled=false;
