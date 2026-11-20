@@ -114,9 +114,29 @@ details p{color:var(--muted);font-size:14px;line-height:1.7;margin:12px 30px 0 0
 footer{padding:27px 0 95px;text-align:center;color:#958d9e;font-size:11px}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 .reveal.visible{opacity:1;transform:translateY(0)}
-.sticky-mobile{display:none}
+/* Oferta fixa: acompanha a rolagem sem criar urgência artificial. */
+.sticky-offer{position:fixed;z-index:75;right:24px;bottom:24px;width:min(440px,calc(100vw - 32px));display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 16px;border:1px solid #e9dff1;border-radius:19px;background:rgba(255,255,255,.97);backdrop-filter:blur(18px);box-shadow:0 18px 55px rgba(40,22,58,.22);animation:offerIn .65s cubic-bezier(.2,.8,.2,1) both}
+@keyframes offerIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.sticky-copy{min-width:0;display:grid;gap:1px}
+.sticky-label{display:flex;align-items:center;gap:7px;color:#655875;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.sticky-pulse{width:7px;height:7px;flex:none;border-radius:50%;background:#2e9b72;box-shadow:0 0 0 0 rgba(46,155,114,.35);animation:pulseDot 1.8s infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(46,155,114,.35)}70%{box-shadow:0 0 0 7px rgba(46,155,114,0)}100%{box-shadow:0 0 0 0 rgba(46,155,114,0)}}
+.sticky-old{font-size:11px;color:#8c8495;line-height:1.2}.sticky-old s{text-decoration-thickness:1.5px}
+.sticky-current{font-size:25px;line-height:1.1;font-weight:950;letter-spacing:-.045em;color:#2b2140;white-space:nowrap}
+.sticky-current small{font-size:12px;letter-spacing:0;color:#6e647a;font-weight:800}
+.sticky-offer .btn{flex:none;padding:14px 16px;font-size:12px;white-space:nowrap}
+.old-price{display:flex;align-items:center;justify-content:center;gap:7px;color:#7f758a;font-size:15px;font-weight:750;margin-top:18px}
+.old-price s{color:#a29aa9;text-decoration-thickness:2px;text-decoration-color:#dd6b9d;font-weight:800}
+.price-now-label{margin-top:15px;font-size:12px;font-weight:900;color:var(--purple);letter-spacing:.12em;text-transform:uppercase}
+.current-price{font-size:clamp(64px,8vw,82px);line-height:1.02;letter-spacing:-.075em;font-weight:950;margin:0;color:#2b2140;white-space:nowrap}
+.current-price small{font-size:23px;letter-spacing:0;vertical-align:top;display:inline-block;margin:12px 4px 0 0}
+.price-caption{font-size:13px;color:var(--muted);margin:8px 0 20px}
+
 @media(max-width:940px){.hero{grid-template-columns:1fr;gap:20px;padding-top:65px}.hero-copy{max-width:800px}.hero-visual{min-height:340px}.report-card{width:min(85%,345px)}.tag-one{right:7%}.tag-two{left:8%}.pillars{grid-template-columns:repeat(3,1fr)}.pillar:nth-child(4),.pillar:nth-child(5){min-height:190px}.navlinks{gap:14px}}
-@media(max-width:700px){.wrap{width:min(100% - 28px,1160px)}.nav{height:68px}.logo img{width:160px;max-width:43vw;max-height:43px}.navlinks{display:none}.nav>.btn{padding:12px 15px;font-size:12px}.hero-shell{padding-top:13px}.hero{min-height:0;padding:49px 24px 33px;border-radius:22px;gap:8px}.hero h1{font-size:clamp(41px,11vw,57px);margin:16px 0}.hero-copy>p{font-size:16px}.hero-actions .btn{width:100%}.hero-visual{min-height:290px}.report-card{width:min(82%,320px);padding:18px}.floating-tag{font-size:10px;padding:9px 11px}.tag-one{top:8%;right:0}.tag-two{bottom:4%;left:0}.strip{gap:12px 18px;padding:19px 5px;font-size:10px}.section{padding:69px 0}.problem-grid{grid-template-columns:1fr;gap:12px;margin-top:27px}.problem{padding:21px}.pillars{grid-template-columns:repeat(2,1fr);gap:10px;margin-top:28px}.pillar{min-height:196px;padding:17px 14px}.pillar:nth-child(5){grid-column:span 2;min-height:150px}.two-col{grid-template-columns:1fr;gap:30px;margin-top:30px}.visual-report{padding:23px}.deliverables,.steps{grid-template-columns:1fr;gap:11px;margin-top:27px}.step{padding:22px}.offer-wrap{padding:43px 14px;border-radius:22px}.price-box{padding:25px 18px 21px}.current-price{font-size:63px}.offer-bullets{display:grid;justify-content:center;text-align:left;width:max-content;max-width:100%;margin:20px auto 0}.last-cta{padding:52px 0 65px}.last-cta .cta-panel{padding:37px 19px}.sticky-mobile{display:flex;position:fixed;z-index:70;bottom:0;left:0;right:0;align-items:center;justify-content:space-between;gap:11px;padding:10px 13px calc(10px + env(safe-area-inset-bottom));background:#ffffffed;backdrop-filter:blur(15px);border-top:1px solid #e8dfef;box-shadow:0 -10px 28px #30174612}.sticky-price{font-size:16px;font-weight:950;line-height:1.15}.sticky-price small{display:block;font-size:9px;font-weight:750;color:var(--muted);letter-spacing:.04em}.sticky-mobile .btn{padding:13px 16px;font-size:12px;white-space:nowrap}footer{padding-bottom:105px}}
+@media(max-width:700px){.wrap{width:min(100% - 28px,1160px)}.nav{height:68px}.logo img{width:160px;max-width:43vw;max-height:43px}.navlinks{display:none}.nav>.btn{padding:12px 15px;font-size:12px}.hero-shell{padding-top:13px}.hero{min-height:0;padding:49px 24px 33px;border-radius:22px;gap:8px}.hero h1{font-size:clamp(41px,11vw,57px);margin:16px 0}.hero-copy>p{font-size:16px}.hero-actions .btn{width:100%}.hero-visual{min-height:290px}.report-card{width:min(82%,320px);padding:18px}.floating-tag{font-size:10px;padding:9px 11px}.tag-one{top:8%;right:0}.tag-two{bottom:4%;left:0}.strip{gap:12px 18px;padding:19px 5px;font-size:10px}.section{padding:69px 0}.problem-grid{grid-template-columns:1fr;gap:12px;margin-top:27px}.problem{padding:21px}.pillars{grid-template-columns:repeat(2,1fr);gap:10px;margin-top:28px}.pillar{min-height:196px;padding:17px 14px}.pillar:nth-child(5){grid-column:span 2;min-height:150px}.two-col{grid-template-columns:1fr;gap:30px;margin-top:30px}.visual-report{padding:23px}.deliverables,.steps{grid-template-columns:1fr;gap:11px;margin-top:27px}.step{padding:22px}.offer-wrap{padding:43px 14px;border-radius:22px}.price-box{padding:25px 18px 21px}.current-price{font-size:63px}.offer-bullets{display:grid;justify-content:center;text-align:left;width:max-content;max-width:100%;margin:20px auto 0}.last-cta{padding:52px 0 65px}.last-cta .cta-panel{padding:37px 19px}.sticky-offer{left:0;right:0;bottom:0;width:100%;border-radius:16px 16px 0 0;border-left:0;border-right:0;border-bottom:0;padding:10px 13px calc(10px + env(safe-area-inset-bottom));gap:8px;box-shadow:0 -10px 30px rgba(40,22,58,.14)}
+.sticky-label{font-size:8px;letter-spacing:.06em}.sticky-old{font-size:9px}.sticky-current{font-size:20px}.sticky-current small{font-size:10px}.sticky-offer .btn{padding:13px 14px;font-size:11px}
+.old-price{font-size:14px;margin-top:15px}.current-price{font-size:66px}.price-now-label{margin-top:12px}
+footer{padding-bottom:105px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
@@ -246,8 +266,9 @@ footer{padding:27px 0 95px;text-align:center;color:#958d9e;font-size:11px}
    <p class="offer-intro">Tenha uma leitura estratégica do seu perfil e um plano para saber o que ajustar nos próximos 30 dias.</p>
    <div class="price-box">
     <div class="price-chip">Condição especial atual</div>
-    <div class="old-price">Valor integral <s>R$ 250,00</s></div>
-    <div class="current-price"><small>R$</small>59,90</div>
+    <div class="old-price">De <s>R$ 250,00</s></div>
+    <div class="price-now-label">Por apenas</div>
+    <div class="current-price"><small>R$</small> 59,90</div>
     <div class="price-caption">Pagamento único à vista</div>
     <a class="btn" href="https://pay.kiwify.com.br/M23mqso">QUERO MEU DIAGNÓSTICO MIV <span class="arrow">→</span></a>
     <p class="payment-note">O checkout da Kiwify apresenta as formas de pagamento e as opções de parcelamento disponíveis. Compras parceladas podem ter acréscimo conforme as condições exibidas no checkout.</p>
@@ -282,7 +303,14 @@ footer{padding:27px 0 95px;text-align:center;color:#958d9e;font-size:11px}
 </section>
 </main>
 <footer><div class="wrap">MIV — Mínimo Instagram Viável · Uma solução da Tri Digital</div></footer>
-<div class="sticky-mobile"><div class="sticky-price">R$ 59,90<small>Condição especial atual</small></div><a class="btn" href="https://pay.kiwify.com.br/M23mqso">Quero meu MIV <span class="arrow">→</span></a></div>
+<aside class="sticky-offer" aria-label="Condição atual do MIV">
+ <div class="sticky-copy">
+  <div class="sticky-label"><span class="sticky-pulse" aria-hidden="true"></span> Condição especial atual</div>
+  <div class="sticky-old">De <s>R$ 250,00</s></div>
+  <div class="sticky-current"><small>Por</small> R$ 59,90</div>
+ </div>
+ <a class="btn" href="https://pay.kiwify.com.br/M23mqso">Quero o MIV <span class="arrow">→</span></a>
+</aside>
 <script>
 (function(){
  const bar=document.getElementById("scrollProgress");
