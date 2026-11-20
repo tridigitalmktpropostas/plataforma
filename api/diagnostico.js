@@ -1169,6 +1169,9 @@ module.exports = async (req, res) => {
       await callAI(SYSTEM_DIAGNOSTIC, texto, images, 9000, "diagnostico")
     );
 
+    // Entrega a prévia do diagnóstico à interface antes de iniciar o plano de ação.
+    sendEvent({ type: "diagnostic", data: diagnostic });
+
     sendEvent({
       type: "progress",
       phase: 1,
