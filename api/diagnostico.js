@@ -1070,12 +1070,14 @@ module.exports = async (req, res) => {
         return res.status(401).json({ valid: false, erro: "Chave inválida ou compra reembolsada." });
       }
       if (record.status === "available") return res.status(200).json({ valid: true, hasReport: false });
-      if (record.status === "used" && record.report_json) {
+      if (record.status === "used") {
         const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
-        if (!expiry || Number.isNaN(expiry.getTime()) || expiry <= new Date()) {
+        if (expiry && !Number.isNaN(expiry.getTime()) && expiry <= new Date()) {
           return res.status(410).json({ valid: false, expired: true, erro: "Seu período de acompanhamento de 30 dias terminou." });
         }
-        return res.status(200).json({ valid: true, hasReport: true, expiresAt: expiry.toISOString() });
+        if (record.report_json && expiry && !Number.isNaN(expiry.getTime())) {
+          return res.status(200).json({ valid: true, hasReport: true, expiresAt: expiry.toISOString() });
+        }
       }
       if (record.status === "processing") {
         return res.status(409).json({ valid: false, erro: "Seu diagnóstico ainda está sendo processado. Aguarde alguns minutos e tente novamente." });
