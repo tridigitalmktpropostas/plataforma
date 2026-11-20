@@ -1097,6 +1097,135 @@ module.exports = async (req, res) => {
       });
     }
 
+    if (action === "customer_store") {
+      const account = await fetchAccessRecord("buyer_email,status,report_json");
+      if (!account || account.status !== "used" || !account.report_json) {
+        return res.status(401).json({ ok: false, erro: "A área do cliente exige uma chave MIV com relatório gerado." });
+      }
+
+      const customerEmail = String(account.buyer_email || "").trim().toLowerCase();
+      if (!customerEmail) {
+        return res.status(401).json({ ok: false, erro: "Não foi possível identificar o titular deste acesso." });
+      }
+
+      const restHeaders = {
+        apikey: supabaseSecret,
+        Authorization: "Bearer " + supabaseSecret,
+      };
+      const safeStoreUrl = (value) => {
+        const input = String(value || "").trim();
+        if (!input) return null;
+        if (input.startsWith("/") && !input.startsWith("//") && !input.includes("\\\\")) return input;
+        try {
+          const parsed = new URL(input);
+          return parsed.protocol === "https:" ? parsed.toString() : null;
+        } catch {
+          return null;
+        }
+      };
+      const readStoreTable = async (table, query) => {
+        const response = await fetch(
+          supabaseUrl + "/rest/v1/" + table + "?" + query,
+          { method: "GET", headers: restHeaders }
+        );
+        const data = await response.json().catch(() => []);
+        if (!response.ok || !Array.isArray(data)) {
+          console.error("Erro ao consultar a loja MIV:", table, data);
+          throw new Error("Não foi possível carregar sua loja e seu histórico de compras.");
+        }
+        return data;
+      };
+
+      const encodedEmail = encodeURIComponent(customerEmail);
+      const [catalogRows, addonRows, mivRows] = await Promise.all([
+        readStoreTable(
+          "miv_products",
+          "select=kiwify_product_id,slug,title,short_description,description,cover_image_url,checkout_url,access_url,access_instructions,is_published,display_order&is_published=eq.true&order=display_order.asc,title.asc"
+        ),
+        readStoreTable(
+          "miv_customer_purchases",
+          "select=kiwify_order_id,kiwify_product_id,product_name,purchase_status,amount,currency,purchased_at,created_at&buyer_email=eq." + encodedEmail + "&order=purchased_at.desc.nullslast,created_at.desc"
+        ),
+        readStoreTable(
+          "miv_access_keys",
+          "select=kiwify_order_id,status,created_at,generated_at,report_json&buyer_email=eq." + encodedEmail + "&order=created_at.desc"
+        ),
+      ]);
+
+      const paidProductIds = new Set(
+        addonRows
+          .filter((row) => row.purchase_status === "paid")
+          .map((row) => String(row.kiwify_product_id || ""))
+      );
+      const products = catalogRows.map((product) => {
+        const owned = paidProductIds.has(String(product.kiwify_product_id || ""));
+        const accessUrl = owned ? safeStoreUrl(product.access_url) : null;
+        return {
+          slug: product.slug,
+          title: product.title,
+          shortDescription: product.short_description || "",
+          description: product.description || "",
+          coverImageUrl: safeStoreUrl(product.cover_image_url),
+          checkoutUrl: owned ? null : safeStoreUrl(product.checkout_url),
+          purchased: owned,
+          hasAccess: Boolean(owned && accessUrl),
+          accessUrl: accessUrl,
+          accessInstructions: owned ? String(product.access_instructions || "") : "",
+        };
+      });
+
+      const mivHistory = mivRows.map((row) => {
+        const status = String(row.status || "");
+        const purchaseStatus =
+          status === "refunded" ? "refunded" :
+          status === "chargeback" ? "chargeback" :
+          ["available", "processing", "used"].includes(status) ? "paid" : "pending";
+        return {
+          kind: "miv",
+          title: "MIV — Mínimo Instagram Viável",
+          status: purchaseStatus,
+          purchasedAt: row.generated_at || row.created_at || null,
+          hasAccess: purchaseStatus === "paid",
+          amount: null,
+          currency: null,
+        };
+      });
+
+      const addonHistory = addonRows.map((row) => {
+        const product = catalogRows.find((item) =>
+          String(item.kiwify_product_id || "") === String(row.kiwify_product_id || "")
+        );
+        const paid = row.purchase_status === "paid";
+        const accessUrl = paid && product?.is_published ? safeStoreUrl(product.access_url) : null;
+        return {
+          kind: "product",
+          productId: row.kiwify_product_id,
+          title: product?.title || row.product_name || "Produto digital",
+          status: row.purchase_status,
+          purchasedAt: row.purchased_at || row.created_at || null,
+          hasAccess: Boolean(accessUrl),
+          accessUrl,
+          accessInstructions: accessUrl ? String(product?.access_instructions || "") : "",
+          amount: row.amount === null ? null : Number(row.amount),
+          currency: row.currency || null,
+        };
+      });
+
+      const purchaseHistory = [...mivHistory, ...addonHistory]
+        .sort((a, b) => {
+          const timeA = a.purchasedAt ? new Date(a.purchasedAt).getTime() : 0;
+          const timeB = b.purchasedAt ? new Date(b.purchasedAt).getTime() : 0;
+          return timeB - timeA;
+        });
+
+      return res.status(200).json({
+        ok: true,
+        customer: { email: customerEmail },
+        products,
+        purchases: purchaseHistory,
+      });
+    }
+
     if (action === "revoke_research") {
       const record = await fetchAccessRecord("status,research_consent,research_snapshot_id");
       if (!record || !["used", "available"].includes(record.status)) {
