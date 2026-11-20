@@ -15,6 +15,7 @@ alter table if exists public.miv_access_keys
   add column if not exists privacy_notice_version text,
   add column if not exists research_consent boolean not null default false,
   add column if not exists research_consent_at timestamptz,
+  add column if not exists research_consent_revoked_at timestamptz,
   add column if not exists research_snapshot_id uuid;
 
 create index if not exists miv_access_keys_access_expires_at_idx
