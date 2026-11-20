@@ -141,9 +141,10 @@ order by display_order, title;
 1. O comprador deve usar na Kiwify o mesmo e-mail da compra original do MIV para que os pedidos sejam agrupados na mesma área do cliente.
 2. Cadastre o ID do produto antes de começar a divulgar o checkout, principalmente se `KIWIFY_PRODUCT_ID` não estiver definido na Vercel.
 3. Não marque `is_published = true` enquanto o conteúdo não estiver pronto.
-4. A tabela de compras não guarda o payload bruto do webhook, dados de cartão ou informações de pagamento desnecessárias.
-5. O catálogo e o histórico não ficam expostos diretamente ao navegador: a API valida a chave MIV e consulta o Supabase no servidor.
-6. Produtos adicionais não criam outra chave de acesso e não alteram o diagnóstico original.
+4. Para parar de vender um produto sem retirar o acesso de quem já comprou, mantenha `is_published = true` e limpe `checkout_url`; assim, clientes que já compraram continuam vendo o acesso, enquanto novos visitantes não recebem um checkout. Não despublique o item enquanto houver compradores que devam manter o acesso.
+5. A tabela de compras não guarda o payload bruto do webhook, dados de cartão ou informações de pagamento desnecessárias.
+6. O catálogo e o histórico não ficam expostos diretamente ao navegador: a API valida a chave MIV e consulta o Supabase no servidor.
+7. Produtos adicionais não criam outra chave de acesso e não alteram o diagnóstico original.
 
 ## Estrutura de dados
 
