@@ -143,6 +143,66 @@ module.exports = async (req, res) => {
     return data;
   }
 
+  // Compras de produtos adicionais usam uma tabela própria.
+  // Não criam outra chave MIV nem disparam uma segunda geração de diagnóstico.
+  const additionalPurchasesUrl = `${supabaseUrl}/rest/v1/miv_customer_purchases`;
+
+  async function upsertAdditionalPurchase(payload, email, orderId, productId) {
+    const product = payload.Product || {};
+    const commissions = payload.Commissions || {};
+    const chargeAmount = Number(commissions.charge_amount);
+    const amount = Number.isFinite(chargeAmount) ? Math.round(chargeAmount) / 100 : null;
+    const approvedDate = payload.approved_date || payload.created_at || null;
+    const purchaseDate = approvedDate && !Number.isNaN(new Date(approvedDate).getTime())
+      ? new Date(approvedDate).toISOString()
+      : new Date().toISOString();
+
+    const response = await fetch(
+      additionalPurchasesUrl + "?on_conflict=kiwify_order_id",
+      {
+        method: "POST",
+        headers: {
+          ...headers,
+          Prefer: "resolution=merge-duplicates,return=representation",
+        },
+        body: JSON.stringify({
+          buyer_email: email,
+          kiwify_order_id: orderId,
+          kiwify_product_id: productId,
+          product_name: String(product.product_name || "Produto digital").slice(0, 180),
+          purchase_status: "paid",
+          amount,
+          currency: String(commissions.currency || "").slice(0, 3) || null,
+          purchased_at: purchaseDate,
+          updated_at: new Date().toISOString(),
+        }),
+      }
+    );
+    const data = await response.json().catch(() => []);
+    if (!response.ok) {
+      console.error("Erro ao registrar compra adicional no Supabase:", data);
+      throw new Error("Não foi possível registrar a compra adicional.");
+    }
+    return Array.isArray(data) ? data[0] || null : null;
+  }
+
+  async function updateAdditionalPurchase(orderId, status) {
+    const response = await fetch(
+      additionalPurchasesUrl + "?kiwify_order_id=eq." + encodeURIComponent(orderId),
+      {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ purchase_status: status, updated_at: new Date().toISOString() }),
+      }
+    );
+    const data = await response.json().catch(() => []);
+    if (!response.ok) {
+      console.error("Erro ao atualizar compra adicional no Supabase:", data);
+      throw new Error("Não foi possível atualizar o acesso do produto.");
+    }
+    return data;
+  }
+
   async function sendAccessEmail(email, accessKey, firstName) {
     const greetingName = firstName ? ` ${firstName}` : "";
     const response = await fetch("https://api.resend.com/emails", {
@@ -202,10 +262,7 @@ module.exports = async (req, res) => {
       return json(res, 200, { ok: true, ignored: true, reason: "Evento sem order_id." });
     }
 
-    if (configuredProductId && productId !== configuredProductId) {
-      return json(res, 200, { ok: true, ignored: true, reason: "Produto diferente do MIV." });
-    }
-
+    const isMivProduct = !configuredProductId || productId === configuredProductId;
     const isRefund =
       eventType.includes("refund") ||
       orderStatus.includes("refund") ||
@@ -213,6 +270,42 @@ module.exports = async (req, res) => {
     const isChargeback =
       eventType.includes("chargeback") ||
       orderStatus.includes("chargeback");
+    const approved =
+      orderStatus === "paid" ||
+      eventType === "order_approved" ||
+      eventType === "subscription_renewed";
+
+    const customer = payload.Customer || {};
+    const email = normalizeEmail(customer.email);
+
+    // Produtos adicionais são registrados como compras da mesma pessoa (por e-mail).
+    // O webhook deve estar inscrito para esses produtos na Kiwify.
+    // Se KIWIFY_PRODUCT_ID não estiver configurado, mantém-se o comportamento legado:
+    // todos os eventos continuam sendo tratados como a compra principal do MIV.
+    if (!isMivProduct) {
+      if (!productId) {
+        return json(res, 200, { ok: true, ignored: true, reason: "Evento sem identificador de produto." });
+      }
+      if (isRefund || isChargeback) {
+        await updateAdditionalPurchase(orderId, isChargeback ? "chargeback" : "refunded");
+        return json(res, 200, { ok: true, purchaseUpdated: true, accessRevoked: true });
+      }
+      if (!approved) {
+        return json(res, 200, { ok: true, ignored: true, reason: "Evento não gera acesso." });
+      }
+      if (!email || !email.includes("@")) {
+        console.error("Compra adicional aprovada sem e-mail de comprador válido.", { orderId, productId });
+        return json(res, 422, { ok: false, error: "E-mail do comprador ausente." });
+      }
+
+      await upsertAdditionalPurchase(payload, email, orderId, productId);
+      return json(res, 200, {
+        ok: true,
+        purchaseRecorded: true,
+        accessLookup: "email",
+        productId,
+      });
+    }
 
     if (isRefund || isChargeback) {
       const existing = await findOrder(orderId);
@@ -225,17 +318,10 @@ module.exports = async (req, res) => {
       return json(res, 200, { ok: true, accessRevoked: true });
     }
 
-    const approved =
-      orderStatus === "paid" ||
-      eventType === "order_approved" ||
-      eventType === "subscription_renewed";
-
     if (!approved) {
       return json(res, 200, { ok: true, ignored: true, reason: "Evento não gera acesso." });
     }
 
-    const customer = payload.Customer || {};
-    const email = normalizeEmail(customer.email);
     if (!email || !email.includes("@")) {
       console.error("Compra aprovada sem e-mail de comprador válido.", { orderId });
       return json(res, 422, { ok: false, error: "E-mail do comprador ausente." });
