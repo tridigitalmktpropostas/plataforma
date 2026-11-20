@@ -1087,7 +1087,7 @@ module.exports = async (req, res) => {
     }
 
     if (action === "resume") {
-      const record = await fetchAccessRecord("status,report_json,form_answers_json,planner_progress,access_expires_at");
+      const record = await fetchAccessRecord("status,report_json,form_answers_json,planner_progress,access_expires_at,research_consent");
       if (!record || record.status !== "used" || !record.report_json) {
         return res.status(404).json({ erro: "Não encontramos um relatório salvo para esta chave." });
       }
