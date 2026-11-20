@@ -350,10 +350,10 @@ function renderMivDiagnosisPreview(data){
  ).join("");
  const mirror=data.espelho||{};
  const mirrorItems=[
-  ["Sua força natural",mirror.forca_natural],
-  ["Ponto de atenção",mirror.ponto_atencao],
-  ["Ponto cego",mirror.ponto_cego],
-  ["Caminho de evolução",mirror.caminho_evolucao]
+  ["Uma força sua que pode trabalhar a favor do negócio",mirror.forca_natural],
+  ["Algo que pode estar pesando",mirror.ponto_atencao],
+  ["Uma conexão que talvez ainda não tenha percebido",mirror.ponto_cego],
+  ["Por onde podemos começar",mirror.caminho_evolucao]
  ];
  const mirrorMarkup=mirrorItems.map(item=>
   '<div style="padding:13px;border:1px solid #eee6f3;border-radius:13px;background:#fff"><div style="margin-bottom:6px;color:#8e69b3;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase">'+esc(item[0])+'</div><div style="color:#5f586b;font-size:11px;line-height:1.6">'+esc(item[1]||"Não foi possível identificar com segurança.")+'</div></div>'
@@ -363,18 +363,18 @@ function renderMivDiagnosisPreview(data){
   '<div style="padding:11px 0;border-bottom:1px solid #eee8f3"><b style="display:block;color:#453452;font-size:11px;margin-bottom:4px">'+esc(item.titulo)+'</b><span style="color:#706879;font-size:10px;line-height:1.55">'+esc(item.explicacao)+'</span></div>'
  ).join("");
  return '<div style="max-width:900px;margin:0 auto 30px;padding:24px 18px;border:1px solid #e8dff0;border-radius:20px;background:linear-gradient(145deg,#fff,#faf6fd);box-shadow:0 12px 35px rgba(54,31,78,.07)">' +
-  '<div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;color:#28845f;font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase"><span>✓</span> Diagnóstico da etapa 1 concluído</div>' +
-  '<h2 style="margin:0 0 10px;font-size:clamp(22px,3vw,29px);line-height:1.15;color:#2c203c">O que a análise identificou</h2>' +
+  '<div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;color:#28845f;font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase"><span>✓</span> Nossa primeira leitura está pronta</div>' +
+  '<h2 style="margin:0 0 10px;font-size:clamp(22px,3vw,29px);line-height:1.15;color:#2c203c">O que já conseguimos perceber sobre você e seu negócio</h2>' +
   '<p style="margin:0 0 20px;color:#5f586b;font-size:13px;line-height:1.7">'+esc(data.resumo||"")+'</p>' +
   '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">Mapa dos cinco pilares</div>' +
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:22px">'+scoreMarkup+'</div>' +
-  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">Leitura estratégica</div>' +
+  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">Olhando para o seu momento</div>' +
   '<div style="padding:15px;border:1px solid #eee6f3;border-radius:14px;background:#fff;margin-bottom:19px">'+reading+'</div>' +
-  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">O espelho do seu posicionamento</div>' +
+  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">O que suas respostas me contam sobre você</div>' +
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-bottom:19px">'+mirrorMarkup+'</div>' +
   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">' +
-   '<div style="padding:14px;border:1px solid #dcefe5;border-radius:14px;background:#f8fcf9"><b style="display:block;margin-bottom:8px;color:#287b59;font-size:11px">Pontos fortes</b><ul style="padding-left:17px;margin:0">'+strong+'</ul></div>' +
-   '<div style="padding:14px;border:1px solid #f1e2d6;border-radius:14px;background:#fffaf6"><b style="display:block;margin-bottom:4px;color:#9e663b;font-size:11px">Pontos de atenção</b>'+attention+'</div>' +
+   '<div style="padding:14px;border:1px solid #dcefe5;border-radius:14px;background:#f8fcf9"><b style="display:block;margin-bottom:8px;color:#287b59;font-size:11px">O que você já tem a seu favor</b><ul style="padding-left:17px;margin:0">'+strong+'</ul></div>' +
+   '<div style="padding:14px;border:1px solid #f1e2d6;border-radius:14px;background:#fffaf6"><b style="display:block;margin-bottom:4px;color:#9e663b;font-size:11px">O que vale ajustar com calma</b>'+attention+'</div>' +
   '</div>' +
   '<p style="margin:17px 0 0;color:#8f849a;font-size:10px;text-align:center">A segunda etapa está transformando este diagnóstico em recomendações, conteúdos, planner e mockup.</p>' +
  '</div>';
@@ -750,11 +750,11 @@ function draw(d,session={}){
 
  if(hasResearchConsent){h+=`<div class="resultbox" id="researchConsentStatus"><strong>Autorização de pesquisa ativa</strong><p>Você autorizou o uso de informações categóricas sem identificadores diretos em análises internas da Tri Digital. Essa autorização é opcional.</p><button class="btn secondary" type="button" onclick="revokeResearchConsent()">Revogar autorização de pesquisa</button></div>`;}
  h+=sec("Mapa do seu perfil","Uma leitura de 0 a 100 sobre o quanto cada área está organizada hoje. Não é uma previsão de resultado.",`<div class="scores">${Object.keys(lb).map(k=>`<div><div class="sl"><span>${lb[k]}</span><b>${N(sc[k])}</b></div><div class="sb"><i data-w="${N(sc[k])}"></i></div></div>`).join("")}</div>`);
- h+=sec("Nossa leitura estratégica","",`<div class="leit">${P(d.leitura)}</div>`);
+ h+=sec("Vamos olhar para o seu momento","",`<div class="leit">${P(d.leitura)}</div>`);
  const e=d.espelho||{};
- h+=sec("O espelho do seu posicionamento","O que seu jeito de trabalhar revela sobre sua comunicação — e como transformar isso em escolhas práticas.",`<div class="grid3"><div class="card"><span class="tag">Sua força natural</span><p>${esc(e.forca_natural||"A análise não trouxe informações suficientes para identificar esta força com segurança.")}</p></div><div class="card"><span class="tag">Ponto de atenção</span><p>${esc(e.ponto_atencao||"Não foi possível identificar um padrão específico com os dados fornecidos.")}</p></div><div class="card"><span class="tag">Ponto cego</span><p>${esc(e.ponto_cego||"Não foi possível estabelecer uma conexão segura entre suas respostas e o perfil.")}</p></div><div class="card"><span class="tag">Seu caminho de evolução</span><p>${esc(e.caminho_evolucao||"Use as recomendações do diagnóstico como ponto de partida.")}</p></div></div>`);
+ h+=sec("O que suas respostas me contam sobre você","Quero te devolver algumas coisas que percebi nas suas respostas. Não para apontar defeitos, mas para mostrar o que você já tem a seu favor e como podemos usar isso na comunicação do seu negócio, respeitando seu jeito.",`<div class="grid3"><div class="card"><span class="tag">Uma força sua que pode trabalhar a favor do negócio</span><p>${esc(e.forca_natural||"A análise não trouxe informações suficientes para identificar esta força com segurança.")}</p></div><div class="card"><span class="tag">Algo que pode estar pesando</span><p>${esc(e.ponto_atencao||"Não foi possível identificar um padrão específico com os dados fornecidos.")}</p></div><div class="card"><span class="tag">Uma conexão que talvez ainda não tenha percebido</span><p>${esc(e.ponto_cego||"Não foi possível estabelecer uma conexão segura entre suas respostas e o perfil.")}</p></div><div class="card"><span class="tag">Seu caminho de evolução</span><p>${esc(e.caminho_evolucao||"Use as recomendações do diagnóstico como ponto de partida.")}</p></div></div>`);
 
- h+=sec("O que já funciona e o que merece atenção","",`<div class="two"><div class="card ok"><h4>Pontos fortes</h4><ul>${li(d.pontos_fortes)}</ul></div><div class="card warn"><h4>Pontos de atenção</h4>${L(d.pontos_atencao).map(x=>`<div class="pa"><b>${esc(x.titulo)}</b><p>${esc(x.explicacao)}</p></div>`).join("")}</div></div>`);
+ h+=sec("O que já está a seu favor — e o que podemos ajustar","",`<div class="two"><div class="card ok"><h4>O que você já tem a seu favor</h4><ul>${li(d.pontos_fortes)}</ul></div><div class="card warn"><h4>O que vale ajustar com calma</h4>${L(d.pontos_atencao).map(x=>`<div class="pa"><b>${esc(x.titulo)}</b><p>${esc(x.explicacao)}</p></div>`).join("")}</div></div>`);
  h+=sec("Posicionamento e bio","Sugestões de bio para você testar e adaptar ao seu jeito.",`<div class="card"><h4>Sua frase de posicionamento</h4><p class="big">${esc(d.posicionamento)}</p></div>${L(d.bios).map((b,i)=>`<div class="card bio"><span class="tag">Opção de bio ${i+1}</span><pre>${esc(b)}</pre></div>`).join("")}`);
  h+=sec("Destaques sugeridos","A vitrine do seu perfil: o que a pessoa precisa encontrar sem precisar perguntar.",`<div class="grid3">${L(d.destaques).map(x=>`<div class="card"><div class="em">${esc(x.emoji)}</div><h4>${esc(x.nome)}</h4><p>${esc(x.conteudo)}</p></div>`).join("")}</div>`);
  h+=sec("3 publicações para fixar no topo","Os primeiros conteúdos que quem chega ao seu perfil vai ver.",`<div class="grid3">${L(d.posts_fixados).map((x,i)=>`<div class="card"><span class="tag">📌 Fixado ${i+1} · ${esc(x.formato)}</span><h4>${esc(x.titulo)}</h4><p>${esc(x.ideia)}</p><p class="cap">${esc(x.legenda)}</p></div>`).join("")}</div>`);
