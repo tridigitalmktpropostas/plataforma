@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MIV — Mínimo Instagram Viável. Um diagnóstico estratégico personalizado para organizar seu Instagram e mostrar o que priorizar para comunicar melhor seu negócio.">
+  <meta name="theme-color" content="#171225">
+  <title>MIV — Mínimo Instagram Viável | Tri Digital</title>
+  <style>
+    :root{--ink:#211a32;--muted:#716a7b;--purple:#7443c8;--pink:#e84b9b;--pale:#f7f2fc;--line:#ece5f3;--white:#fff;--dark:#171225;--green:#277b60}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#fff;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+    .nav{height:78px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.04em}
+    .brand-mark{width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;color:white;font-size:17px}
+    .brand small{display:block;color:#9b91a7;font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-top:-4px}
+    .nav-link{font-size:14px;color:#5b5366;font-weight:650}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:15px 23px;border-radius:12px;background:linear-gradient(100deg,var(--purple),var(--pink));color:white;font-weight:800;box-shadow:0 9px 24px #8748c52b;transition:transform .18s,box-shadow .18s}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 13px 28px #8748c540}
+    .btn.light{background:white;color:var(--purple);box-shadow:none}
+    .hero{position:relative;overflow:hidden;background:linear-gradient(115deg,#6033a6 0%,#9d3fab 52%,#ee5a9d 100%);color:#fff;border-radius:28px;margin:8px auto 0;padding:78px 7.2% 70px;min-height:510px;display:flex;align-items:center}
+    .hero:before,.hero:after{content:"";position:absolute;border:1px solid #ffffff30;border-radius:50%;pointer-events:none}
+    .hero:before{width:450px;height:450px;right:-100px;top:-145px}
+    .hero:after{width:310px;height:310px;right:-30px;top:-75px}
+    .hero-content{position:relative;z-index:1;max-width:660px}
+    .eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#f7d9f0}
+    h1{font-size:clamp(42px,6vw,68px);line-height:1.04;letter-spacing:-.055em;margin:19px 0 20px;max-width:700px}
+    .hero p{font-size:18px;line-height:1.65;color:#f8eefa;max-width:590px;margin:0 0 29px}
+    .hero-note{font-size:13px;color:#f8eefa;margin-top:15px}
+    .price-inline{font-weight:850;color:#fff}
+    .trust-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;color:#f9eefa;font-size:13px}
+    .trust-row span{display:inline-flex;align-items:center;gap:7px}
+    .section{padding:82px 0}
+    .section.soft{background:var(--pale)}
+    .center{text-align:center}
+    .kicker{color:var(--purple);font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:850}
+    h2{font-size:clamp(30px,4vw,44px);line-height:1.12;letter-spacing:-.045em;margin:12px auto 14px;max-width:760px}
+    .lead{max-width:720px;margin:0 auto;color:var(--muted);font-size:17px}
+    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:38px}
+    .pillar{padding:23px 19px;background:#fff;border:1px solid var(--line);border-radius:18px;min-height:190px}
+    .pillar .num{width:34px;height:34px;border-radius:10px;background:#f0e7fb;color:var(--purple);display:grid;place-items:center;font-weight:850;margin-bottom:18px}
+    .pillar h3{margin:0 0 7px;font-size:17px}
+    .pillar p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:42px}
+    .mock-card{background:linear-gradient(145deg,#21172f,#39254f);border-radius:24px;padding:28px;color:#fff;box-shadow:0 25px 50px #21172f1c}
+    .mock-top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff25;padding-bottom:18px;margin-bottom:20px}
+    .mock-top strong{font-size:14px}
+    .mock-score{display:flex;align-items:end;gap:8px;margin:18px 0 24px}
+    .mock-score b{font-size:55px;line-height:1;color:#ffd5ed;letter-spacing:-.06em}
+    .mock-score span{font-size:12px;color:#d4c6df}
+    .bar{height:7px;background:#ffffff20;border-radius:99px;margin:13px 0 19px;overflow:hidden}
+    .bar i{display:block;height:100%;width:72%;background:linear-gradient(90deg,#a47aff,#fa83c1);border-radius:99px}
+    .mock-lines{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .mock-lines div{padding:13px;background:#ffffff10;border-radius:12px;font-size:12px;color:#eadff3}
+    .checklist{list-style:none;padding:0;margin:25px 0 0;display:grid;gap:15px}
+    .checklist li{display:flex;gap:12px;align-items:flex-start;color:#51495d}
+    .check{flex:0 0 23px;width:23px;height:23px;border-radius:50%;background:#e8f5ef;color:var(--green);display:grid;place-items:center;font-size:13px;font-weight:900;margin-top:1px}
+    .deliver-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:37px}
+    .deliver{border:1px solid var(--line);border-radius:17px;padding:23px;background:#fff}
+    .deliver b{display:block;margin:0 0 7px}
+    .deliver p{margin:0;color:var(--muted);font-size:14px}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px;text-align:left}
+    .step{padding:25px;border-radius:18px;background:#fff;border:1px solid var(--line)}
+    .step-no{font-size:12px;font-weight:850;color:var(--pink);letter-spacing:.12em}
+    .step h3{margin:8px 0 7px;font-size:18px}
+    .step p{margin:0;color:var(--muted);font-size:14px}
+    .pricing{max-width:690px;margin:38px auto 0;background:#fff;border:1px solid var(--line);border-radius:24px;padding:34px;box-shadow:0 20px 55px #4b2b6c12;text-align:center}
+    .old{font-size:14px;color:#9c94a3;text-decoration:line-through}
+    .price{font-size:58px;letter-spacing:-.06em;font-weight:900;line-height:1.15;margin:4px 0}
+    .price small{font-size:18px;letter-spacing:0}
+    .pay-note{font-size:13px;color:var(--muted);margin:8px 0 22px}
+    .faq{max-width:800px;margin:32px auto 0;text-align:left}
+    details{padding:19px 0;border-bottom:1px solid var(--line)}
+    summary{font-weight:750;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:18px}
+    summary:after{content:"+";color:var(--purple);font-size:22px;line-height:1}
+    details[open] summary:after{content:"−"}
+    details p{color:var(--muted);margin:12px 0 0;font-size:15px}
+    .final-cta{background:linear-gradient(110deg,#382051,#7c3da7);color:#fff;border-radius:25px;padding:52px 25px;text-align:center;margin:0 auto}
+    .final-cta h2{color:#fff}
+    .final-cta p{color:#f0e4f5;max-width:620px;margin:0 auto 24px}
+    footer{padding:32px 0;color:#8e8796;font-size:12px;text-align:center}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.pillar:last-child{grid-column:span 2}.two-col{grid-template-columns:1fr;gap:30px}.deliver-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.wrap{width:min(100% - 28px,1120px)}.nav{height:68px}.nav-link{display:none}.hero{padding:54px 25px 48px;min-height:0;border-radius:20px}.hero p{font-size:16px}.section{padding:62px 0}.grid{grid-template-columns:1fr 1fr;gap:10px}.pillar{padding:17px 14px;min-height:190px}.pillar:last-child{grid-column:span 2}.deliver-grid,.steps{grid-template-columns:1fr}.pricing{padding:27px 18px}.price{font-size:50px}.trust-row{gap:10px}.final-cta{padding:38px 20px}}
+  </style>
+</head>
+<body>
+  <header class="wrap nav">
+    <a class="brand" href="https://www.mivtridigital.com.br" aria-label="MIV Tri Digital">
+      <span class="brand-mark">M</span>
+      <span>MIV <small>por Tri Digital</small></span>
+    </a>
+    <a class="nav-link" href="#como-funciona">Como funciona</a>
+    <a class="nav-link" href="#o-que-recebe">O que você recebe</a>
+    <a class="btn" href="https://pay.kiwify.com.br/M23mqso">Quero meu diagnóstico <span aria-hidden="true">→</span></a>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div class="hero-content">
+        <div class="eyebrow">MIV · Mínimo Instagram Viável</div>
+        <h1>Seu Instagram precisa do essencial para vender.</h1>
+        <p>Descubra o que está claro, o que está confundindo seu cliente e o que precisa ser ajustado para seu perfil comunicar melhor o valor do seu negócio.</p>
+        <a class="btn light" href="https://pay.kiwify.com.br/M23mqso">Quero meu diagnóstico por R$ 59,90 <span aria-hidden="true">→</span></a>
+        <div class="hero-note">Um direcionamento estratégico personalizado para o seu negócio e para a sua rotina.</div>
+        <div class="trust-row">
+          <span>✓ Diagnóstico personalizado</span>
+          <span>✓ Orientação prática</span>
+          <span>✓ Acesso online</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap center">
+        <div class="kicker">Não é sobre postar mais</div>
+        <h2>É sobre fazer seu Instagram trabalhar com mais intenção.</h2>
+        <p class="lead">Às vezes, o problema não é falta de conteúdo. É não deixar claro o que você oferece, não mostrar por que confiar em você ou não facilitar o próximo passo para quem chega ao seu perfil.</p>
+        <div class="grid">
+          <article class="pillar"><div class="num">01</div><h3>Clareza</h3><p>Seu cliente entende o que você faz, para quem e como pode comprar?</p></article>
+          <article class="pillar"><div class="num">02</div><h3>Credibilidade</h3><p>Seu perfil transmite confiança e mostra evidências reais do seu trabalho?</p></article>
+          <article class="pillar"><div class="num">03</div><h3>Conteúdo</h3><p>O que você publica ajuda o público a reconhecer valor e tomar decisões?</p></article>
+          <article class="pillar"><div class="num">04</div><h3>Conversão</h3><p>Está fácil sair da visita ao perfil e chegar ao contato ou à compra?</p></article>
+          <article class="pillar"><div class="num">05</div><h3>Consistência</h3><p>Existe uma rotina possível de manter, sem depender de estar sempre inspirado?</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft" id="o-que-recebe">
+      <div class="wrap">
+        <div class="two-col">
+          <div class="mock-card" aria-label="Exemplo ilustrativo de painel de diagnóstico MIV">
+            <div class="mock-top"><strong>SEU DIAGNÓSTICO MIV</strong><span style="font-size:11px;color:#d9c9e8">TRI DIGITAL</span></div>
+            <div style="font-size:12px;color:#d4c6df">Visão geral dos cinco pilares</div>
+            <div class="mock-score"><b>05</b><span>pilares analisados<br>com direcionamento individual</span></div>
+            <div style="font-size:12px;color:#eadff3">Clareza do perfil</div><div class="bar"><i></i></div>
+            <div class="mock-lines"><div>Leitura do negócio</div><div>Posicionamento</div><div>Conteúdo e bio</div><div>Plano de ação</div></div>
+          </div>
+          <div>
+            <div class="kicker">O que você recebe</div>
+            <h2>Não é uma lista genérica de dicas. É um caminho para o seu negócio.</h2>
+            <p class="lead" style="margin:0">O MIV cruza as informações do seu negócio, do seu Instagram e da sua disponibilidade para transformar o diagnóstico em decisões e tarefas práticas.</p>
+            <ul class="checklist">
+              <li><span class="check">✓</span><span><b>Leitura dos cinco pilares</b><br>Entenda os pontos fortes e os gargalos atuais do seu perfil.</span></li>
+              <li><span class="check">✓</span><span><b>Posicionamento e bio</b><br>Receba sugestões de comunicação, bio e organização dos destaques.</span></li>
+              <li><span class="check">✓</span><span><b>Conteúdo com direção</b><br>Três propostas de posts fixados e nove ideias de conteúdo adaptadas ao negócio.</span></li>
+              <li><span class="check">✓</span><span><b>Plano de ação de 30 dias</b><br>Uma visão por semana e um planner operacional com tarefas compatíveis com sua disponibilidade.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="deliver-grid">
+          <article class="deliver"><b>Uma leitura do seu momento</b><p>O que já ajuda seu perfil e o que pode estar dificultando a compreensão da sua oferta.</p></article>
+          <article class="deliver"><b>Recomendações utilizáveis</b><p>Exemplos de textos, pautas e ajustes para você adaptar e colocar em prática.</p></article>
+          <article class="deliver"><b>Prioridades claras</b><p>Saiba o que fazer primeiro, o que vem depois e o que pode esperar.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="como-funciona">
+      <div class="wrap center">
+        <div class="kicker">Simples de começar</div>
+        <h2>Como funciona o MIV?</h2>
+        <p class="lead">Você responde ao diagnóstico e recebe uma orientação pensada a partir das informações que compartilhar.</p>
+        <div class="steps">
+          <article class="step"><div class="step-no">PASSO 01</div><h3>Faça sua compra</h3><p>Finalize o pagamento com segurança pelo checkout da Kiwify.</p></article>
+          <article class="step"><div class="step-no">PASSO 02</div><h3>Receba seu acesso</h3><p>Após a confirmação do pagamento, você recebe por e-mail as instruções e sua chave de acesso.</p></article>
+          <article class="step"><div class="step-no">PASSO 03</div><h3>Responda e descubra</h3><p>Acesse a plataforma, conte sobre seu negócio e receba seu direcionamento estratégico.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft">
+      <div class="wrap center">
+        <div class="kicker">Comece pelo essencial</div>
+        <h2>Seu próximo passo para organizar o Instagram.</h2>
+        <div class="pricing">
+          <div style="font-weight:800;color:var(--purple);font-size:13px;letter-spacing:.12em;text-transform:uppercase">MIV · Mínimo Instagram Viável</div>
+          <div class="price"><small>R$</small> 59,90</div>
+          <p class="pay-note">Pagamento único • Acesso online • Diagnóstico personalizado</p>
+          <a class="btn" href="https://pay.kiwify.com.br/M23mqso">Quero meu MIV agora <span aria-hidden="true">→</span></a>
+          <p style="font-size:12px;color:var(--muted);margin:16px 0 0">Você será direcionado ao checkout seguro da Kiwify.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap center">
+        <div class="kicker">Dúvidas frequentes</div>
+        <h2>Antes de começar</h2>
+        <div class="faq">
+          <details><summary>O MIV faz a gestão do meu Instagram?</summary><p>Não. O MIV é um diagnóstico estratégico com recomendações e um plano de ação para você aplicar. Não inclui postagem, criação de artes ou gestão mensal do perfil.</p></details>
+          <details><summary>Preciso entender de marketing para usar?</summary><p>Não. As orientações são apresentadas em linguagem simples, com exemplos e ações explicadas para que você consiga entender o que fazer e por quê.</p></details>
+          <details><summary>As recomendações são iguais para todo mundo?</summary><p>Não. O direcionamento é elaborado a partir das respostas sobre seu negócio, seu perfil, seus objetivos e sua disponibilidade. Quanto mais completas forem as informações, mais contexto haverá para a análise.</p></details>
+          <details><summary>O MIV garante que vou vender mais?</summary><p>Não existe garantia de vendas. O objetivo é ajudar você a identificar ajustes e organizar a comunicação e o caminho de contato do seu Instagram.</p></details>
+          <details><summary>Como recebo o acesso?</summary><p>Após a confirmação do pagamento, as instruções e a chave de acesso são enviadas para o e-mail informado na compra. Você utiliza a chave na plataforma MIV.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap final-cta">
+      <div class="eyebrow">MIV · Tri Digital</div>
+      <h2>Chega de fazer por fazer. Descubra o que seu Instagram realmente precisa.</h2>
+      <p>Comece com um diagnóstico, entenda suas prioridades e organize os próximos 30 dias com mais clareza.</p>
+      <a class="btn light" href="https://pay.kiwify.com.br/M23mqso">Quero começar meu diagnóstico</a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">MIV — Mínimo Instagram Viável · Uma solução da Tri Digital</div>
+  </footer>
+</body>
+</html>
