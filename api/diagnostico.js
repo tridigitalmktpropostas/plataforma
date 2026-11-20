@@ -1415,7 +1415,7 @@ module.exports = async (req, res) => {
     }
 
     if (requestedProvider && requestedProvider !== provider) {
-      console.warn("AI_PROVIDER solicitado não tem chave disponível; usando o provedor configurado:", provider);
+      console.warn("AI_PROVIDER solicitado diverge da prioridade do MIV; usando o provedor disponível para o modelo selecionado:", provider);
     }
 
     // Reserva a chave uma única vez para as duas etapas.
