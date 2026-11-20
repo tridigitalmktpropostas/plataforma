@@ -893,7 +893,7 @@ module.exports = async (req, res) => {
   };
 
   // Modelo GPT escolhido para o MIV. Mantém o endpoint Chat Completions e o JSON mode atuais.
-  const OPENAI_MODEL_ID = "gpt-6.1-terra";
+  const OPENAI_MODEL_ID = "gpt-6.2-sol";
 
   const callAI = async (systemPrompt, userText, images, maxTokens, stageName) => {
     let output = "";
@@ -914,6 +914,7 @@ module.exports = async (req, res) => {
         },
         body: JSON.stringify({
           model: OPENAI_MODEL_ID,
+          reasoning_effort: "medium",
           max_completion_tokens: maxTokens,
           response_format: { type: "json_object" },
           messages: [
