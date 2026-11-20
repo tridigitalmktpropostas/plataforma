@@ -105,6 +105,38 @@ footer{max-width:1100px;margin:0 auto 35px;padding:0 22px;color:var(--muted);fon
 .client-product-coming .tag{display:inline-block;padding:6px 9px;border-radius:99px;background:#f4eafa;color:#7d48ad;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
 .client-product-coming h4{margin:12px 0 6px;font-size:17px;color:#332b40}
 .client-product-coming p{margin:0;color:#777082;font-size:13px;line-height:1.6}
+.store-section{margin-top:24px}
+.store-section:first-child{margin-top:0}
+.store-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px}
+.store-section-heading h3{margin:0;font-size:19px;color:#30283d}
+.store-section-heading p{margin:5px 0 0;color:#7b7384;font-size:12px;line-height:1.5}
+.store-refresh{border:1px solid #e2d7eb;background:#fff;color:#7443a8;padding:9px 12px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer}
+.store-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.store-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #ece5f2;border-radius:15px;background:#fff}
+.store-card-media{height:135px;background:linear-gradient(135deg,#f3eafa,#fcecf5);display:grid;place-items:center;overflow:hidden}
+.store-card-media img{width:100%;height:100%;object-fit:cover}
+.store-card-placeholder{font-size:30px;color:#9a65bd}
+.store-card-body{display:flex;flex:1;flex-direction:column;gap:9px;padding:15px}
+.store-card-body h4{margin:0;color:#332b40;font-size:15px}
+.store-card-body p{margin:0;color:#777082;font-size:12px;line-height:1.55}
+.store-card-actions{margin-top:auto;padding-top:4px}
+.store-action{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:9px 12px;border-radius:10px;background:#8246c9;color:#fff!important;text-decoration:none!important;font-size:11px;font-weight:900}
+.store-action.secondary{background:#f3eafa;color:#7542a5!important}
+.store-state{display:inline-flex;align-self:flex-start;padding:5px 8px;border-radius:99px;background:#edf8f1;color:#267244;font-size:9px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.store-state.pending{background:#fff5e8;color:#99601b}
+.store-state.revoked{background:#fceeee;color:#a33c3c}
+.store-empty{padding:20px;border:1px dashed #d9c9e8;border-radius:14px;background:#fff;color:#777082;font-size:13px;line-height:1.6}
+.store-history{display:flex;flex-direction:column;gap:8px}
+.store-history-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border:1px solid #eee8f3;border-radius:12px;background:#fff}
+.store-history-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.store-history-main strong{color:#342b43;font-size:12px;overflow-wrap:anywhere}
+.store-history-main small{color:#847b8d;font-size:10px}
+.store-history-meta{display:flex;flex:none;flex-direction:column;align-items:flex-end;gap:5px}
+.store-history-meta b{font-size:11px;color:#342b43}
+.store-help{margin-top:13px;padding:13px 15px;border-radius:12px;background:#f7f3fa;color:#776c82;font-size:11px;line-height:1.6}
+.store-loading{padding:18px;border:1px solid #ece5f2;border-radius:14px;background:#fff;color:#7d7388;font-size:13px}
+@media(max-width:520px){.store-grid{grid-template-columns:1fr}.store-card-media{height:155px}.store-history-item{align-items:flex-start}.store-history-meta{align-items:flex-end}}
+
 @media(max-width:760px){.client-welcome{flex-direction:column;padding:20px}.client-profile-card{align-self:stretch}.client-logout{align-self:flex-start}.planner-overview{grid-template-columns:1fr}.client-planner .calendar{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.client-tabs{gap:4px;padding:4px}.client-tab{padding:11px 4px;font-size:10px}.client-planner .calendar{grid-template-columns:1fr}.client-welcome h2{font-size:25px}.client-products{padding:18px}}
 @media print{.client-welcome,.client-tabs{display:none!important}.client-pane[hidden]{display:block!important}.client-pane:not(#clientReportPane){display:none!important}}
@@ -243,7 +275,7 @@ function render(){
    <section class="consent-card">
     <h3>Privacidade e uso das informações</h3>
     <p class="consent-muted">Leia como suas informações serão utilizadas para entregar e manter seu acompanhamento.</p>
-    <label class="consent-item"><input id="privacyAck" type="checkbox" required> <span>Li o <a href="/politica-de-privacidade.html" target="_blank" rel="noopener">Aviso de Privacidade</a> e estou ciente de que minhas respostas, diagnóstico e progresso serão armazenados para disponibilizar minha área do cliente, sem prazo de expiração previamente definido, conforme o aviso.</span></label>
+    <label class="consent-item"><input id="privacyAck" type="checkbox" required> <span>Li o <a href="/politica-de-privacidade.html" target="_blank" rel="noopener">Aviso de Privacidade</a> e estou ciente de que minhas respostas, diagnóstico, progresso e dados mínimos de compras vinculados ao meu e-mail serão tratados para disponibilizar minha área do cliente e os produtos adquiridos, conforme o aviso.</span></label>
     <label class="consent-item"><input id="researchConsent" type="checkbox"> <span><strong>Opcional:</strong> autorizo a Tri Digital a utilizar informações estruturadas e desidentificadas, sem identificadores diretos, do diagnóstico em análises internas sobre negócios e marketing. Esta escolha não altera meu acesso ao MIV e pode ser revogada pelo canal indicado no aviso.</span></label>
    </section>` : "");
  $("backBtn").style.visibility=step===0?"hidden":"visible";$("nextBtn").textContent=step===groups.length-1?"Gerar meu diagnóstico →":"Continuar →";
@@ -605,6 +637,90 @@ async function savePlannerProgress(completed){
  });
  return plannerSaveQueue;
 }
+let customerStoreLoadedAt=0;
+function storeMoney(value,currency){
+ const amount=Number(value);
+ if(!Number.isFinite(amount))return "";
+ const code=String(currency||"BRL").toUpperCase();
+ try{return new Intl.NumberFormat("pt-BR",{style:"currency",currency:code}).format(amount);}
+ catch{return amount.toFixed(2)+" "+code;}
+}
+function storeDate(value){
+ if(!value)return "Data não informada";
+ const date=new Date(value);
+ return Number.isNaN(date.getTime())?"Data não informada":date.toLocaleDateString("pt-BR");
+}
+function renderCustomerStore(data){
+ const root=$("customerStoreContent");
+ if(!root)return;
+ const products=Array.isArray(data.products)?data.products:[];
+ const purchases=Array.isArray(data.purchases)?data.purchases:[];
+ const owned=products.filter(p=>p.purchased);
+ const available=products.filter(p=>!p.purchased);
+ const pending=purchases.filter(p=>p.kind==="product"&&p.status==="paid"&&!p.hasAccess);
+ const productCard=(product,isOwned)=>{
+  const image=product.coverImageUrl
+   ? '<img src="'+esc(product.coverImageUrl)+'" alt="'+esc(product.title)+'" loading="lazy">'
+   : '<span class="store-card-placeholder">✦</span>';
+  const status=isOwned
+   ? '<span class="store-state">Compra aprovada</span>'
+   : '<span class="store-state pending">Disponível</span>';
+  let action="";
+  if(isOwned&&product.hasAccess&&product.accessUrl){
+   action='<a class="store-action" href="'+esc(product.accessUrl)+'" target="_blank" rel="noopener noreferrer">Acessar produto</a>';
+  }else if(isOwned){
+   action='<span class="store-state pending">Acesso em preparação</span>';
+  }else if(product.checkoutUrl){
+   action='<a class="store-action secondary" href="'+esc(product.checkoutUrl)+'" target="_blank" rel="noopener noreferrer">Conhecer e comprar</a>';
+  }else{
+   action='<span class="store-state pending">Em breve</span>';
+  }
+  const description=product.shortDescription||product.description||"Conteúdo digital da Tri Digital.";
+  return '<article class="store-card"><div class="store-card-media">'+image+'</div><div class="store-card-body">'+status+'<h4>'+esc(product.title)+'</h4><p>'+esc(description)+'</p><div class="store-card-actions">'+action+'</div></div></article>';
+ };
+ const mivOwned=purchases.some(p=>p.kind==="miv"&&p.status==="paid");
+ const ownedHtml=owned.length
+  ? '<div class="store-grid">'+owned.map(p=>productCard(p,true)).join("")+'</div>'
+  : '<div class="store-empty">Quando você adquirir novos produtos da Tri Digital, eles aparecerão aqui com o botão de acesso liberado.</div>';
+ const availableHtml=available.length
+  ? '<div class="store-grid">'+available.map(p=>productCard(p,false)).join("")+'</div>'
+  : '<div class="store-empty">Estamos preparando os próximos produtos da Tri Digital. Assim que forem publicados, você poderá conhecer e comprar diretamente por esta área.</div>';
+ const historyHtml=purchases.length
+  ? '<div class="store-history">'+purchases.map(p=>{
+     const statusLabel=p.status==="paid"?(p.hasAccess?"Acesso liberado":"Compra aprovada · conteúdo indisponível"):p.status==="refunded"?"Reembolsada":p.status==="chargeback"?"Chargeback":"Em processamento";
+     const stateClass=p.status==="paid"?"":p.status==="refunded"||p.status==="chargeback"?"revoked":"pending";
+     const amount=storeMoney(p.amount,p.currency);
+     return '<div class="store-history-item"><div class="store-history-main"><strong>'+esc(p.title||"Produto digital")+'</strong><small>'+esc(storeDate(p.purchasedAt))+(p.kind==="miv"?" · MIV":" · Produto adicional")+'</small></div><div class="store-history-meta">'+(amount?'<b>'+esc(amount)+'</b>':"")+'<span class="store-state '+stateClass+'">'+esc(statusLabel)+'</span></div></div>';
+    }).join("")+'</div>'
+  : '<div class="store-empty">Seu histórico de compras aparecerá aqui.</div>';
+ const pendingHtml=pending.length
+  ? '<div class="store-help">'+pending.length+' compra(s) adicional(is) aprovada(s) foram reconhecidas. O conteúdo ficará disponível assim que o produto correspondente for publicado e configurado pela Tri Digital.</div>'
+  : "";
+ root.innerHTML=
+  '<div class="store-section"><div class="store-section-heading"><div><h3>Meus produtos</h3><p>Conteúdos que você já adquiriu e pode acessar.</p></div><button type="button" class="store-refresh" onclick="loadCustomerStore(true)">Atualizar</button></div>'+ownedHtml+pendingHtml+'</div>'+
+  '<div class="store-section"><div class="store-section-heading"><div><h3>Continue sua evolução</h3><p>Novos materiais, ferramentas e experiências da Tri Digital.</p></div></div>'+availableHtml+'</div>'+
+  '<div class="store-section"><div class="store-section-heading"><div><h3>Histórico de compras</h3><p>Pedidos vinculados ao e-mail da sua compra original do MIV.</p></div></div>'+historyHtml+'</div>'+
+  '<div class="store-help">As compras aprovadas são vinculadas automaticamente ao seu acesso MIV pelo e-mail informado no checkout. Em caso de reembolso ou chargeback, a liberação do produto é retirada.</div>';
+ customerStoreLoadedAt=Date.now();
+}
+async function loadCustomerStore(force=false){
+ const root=$("customerStoreContent");
+ if(!root||!validatedAccessKey)return;
+ if(!force&&customerStoreLoadedAt&&Date.now()-customerStoreLoadedAt<60000)return;
+ root.className="store-loading";
+ root.textContent="Carregando seus produtos e compras…";
+ try{
+  const response=await fetch("/api/diagnostico",{
+   method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({action:"customer_store",accessKey:validatedAccessKey})
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||data.ok!==true)throw new Error(data.erro||"Não foi possível carregar sua loja.");
+  renderCustomerStore(data);
+ }catch(error){
+  root.innerHTML='<div class="store-empty">'+esc(error.message||"Não foi possível carregar seus produtos.")+'<br><button type="button" class="store-refresh" onclick="loadCustomerStore(true)" style="margin-top:12px">Tentar novamente</button></div>';
+ }
+}
 function switchClientTab(tab){
  const allowed=["report","planner","products"];
  if(!allowed.includes(tab))return;
@@ -620,6 +736,7 @@ function switchClientTab(tab){
   document.querySelectorAll("#clientPlannerPane .rv").forEach(el=>el.classList.add("in"));
   document.querySelectorAll("#clientPlannerPane [data-w]").forEach(el=>el.style.width=el.dataset.w+"%");
  }
+ if(tab==="products")loadCustomerStore();
  scrollTo({top:0,behavior:"smooth"});
 }
 function draw(d,session={}){
@@ -672,12 +789,17 @@ function draw(d,session={}){
   <section class="client-pane" id="clientReportPane" data-client-pane="report">${h}</section>
   <section class="client-pane client-planner" id="clientPlannerPane" data-client-pane="planner" hidden>${plannerHtml}</section>
   <section class="client-pane" id="clientProductsPane" data-client-pane="products" hidden>
-   <div class="client-products"><span class="client-kicker" style="color:#8a51b2">CONTINUE SUA EVOLUÇÃO</span><h3>Outros produtos da Tri Digital</h3><p>Estamos preparando novas ferramentas, materiais e experiências para ajudar você a dar os próximos passos na organização do seu marketing.</p>
-    <div class="client-product-coming"><span class="tag">Em breve</span><h4>Novas soluções para o seu negócio</h4><p>Quando novos produtos estiverem disponíveis, você poderá conhecer os detalhes e acessar as opções de compra diretamente por esta área do cliente.</p></div>
+   <div class="client-products">
+    <span class="client-kicker" style="color:#8a51b2">SUA VITRINE TRI DIGITAL</span>
+    <h3>Produtos e próximas etapas</h3>
+    <p>Veja o que você já comprou, acesse seus materiais liberados e encontre novas soluções para continuar evoluindo.</p>
+    <div id="customerStoreContent" class="store-loading" role="status" aria-live="polite">Carregando seus produtos e compras…</div>
    </div>
   </section>
  </div>`;
  $("resultPanel").innerHTML=portalHtml;
+ customerStoreLoadedAt=0;
+ loadCustomerStore(true);
  const updatePlannerProgressUI=()=>{
   const done=completedSet.size;
   const label=$("plannerProgressLabel"),fill=$("plannerProgressFill");
