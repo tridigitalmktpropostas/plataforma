@@ -338,8 +338,8 @@ module.exports = async (req, res) => {
 
     // Produtos adicionais são registrados como compras da mesma pessoa (por e-mail).
     // O webhook deve estar inscrito para esses produtos na Kiwify.
-    // Se KIWIFY_PRODUCT_ID não estiver configurado, mantém-se o comportamento legado:
-    // todos os eventos continuam sendo tratados como a compra principal do MIV.
+    // Sem KIWIFY_PRODUCT_ID, o catálogo identifica os IDs adicionais já cadastrados;
+    // produtos fora do catálogo seguem pelo fluxo legado do MIV.
     if (!isMivProduct) {
       if (!productId) {
         return json(res, 200, { ok: true, ignored: true, reason: "Evento sem identificador de produto." });
