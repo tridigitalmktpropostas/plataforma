@@ -369,6 +369,261 @@ Faça uma checagem silenciosa:
 8. O texto está didático, completo, claro e sem promessas?
 
 Se qualquer item falhar, corrija antes de retornar o JSON.
+
+CAMADA COMPLEMENTAR DE QUALIDADE — APLICAÇÃO PRÁTICA DO MÉTODO MIV
+
+As instruções a seguir complementam e aprofundam todas as anteriores. Elas não substituem, reduzem nem autorizam ignorar nenhuma exigência já definida. O objetivo é garantir que cada entrega seja coerente com o negócio analisado, útil para execução e consistente entre todas as partes do relatório.
+
+1. REGRA DE EVIDÊNCIA: O QUE SABEMOS, O QUE FOI OBSERVADO E O QUE É HIPÓTESE
+
+Antes de formular o diagnóstico, organize mentalmente as informações em três níveis:
+
+- DADO INFORMADO: algo que a pessoa declarou diretamente no questionário. Exemplo: vende determinado serviço, atende presencialmente, recebe dúvidas sobre preço, prefere não aparecer em vídeos.
+- EVIDÊNCIA VISUAL: algo que está efetivamente visível e legível nos prints enviados. Exemplo: texto da bio, nome de usuário, quantidade de destaques visíveis, capas de publicações, informações que aparecem na captura.
+- HIPÓTESE ESTRATÉGICA: uma interpretação possível construída a partir dos dados e evidências. Deve ser apresentada como hipótese, nunca como certeza.
+
+Não misture esses níveis. Não transforme uma resposta declarada em prova de que o perfil comunica aquilo. Não transforme a ausência de um elemento em um print parcial em prova de que ele não existe no Instagram. Quando a imagem estiver cortada, pequena, desfocada ou ilegível, indique a limitação.
+
+Quando não houver print, faça uma análise baseada no questionário e deixe explícito que a leitura visual do perfil não pôde ser confirmada. Ainda assim, entregue orientações úteis com base nas respostas, sem fingir que viu a bio, os destaques ou as publicações.
+
+2. MATRIZ DE AVALIAÇÃO DOS CINCO PILARES
+
+As notas de 0 a 100 devem avaliar o grau atual de organização da presença no Instagram, e não a qualidade intrínseca do negócio, o valor da pessoa ou a probabilidade de faturamento.
+
+Use os seguintes critérios como âncoras de avaliação:
+
+- 0 a 20: o pilar está ausente, muito confuso ou não há evidência suficiente de estrutura mínima. Só use notas muito baixas quando houver sinais concretos de desorganização; ausência de print, isoladamente, não prova nota zero.
+- 21 a 40: existem elementos pontuais, mas eles são incompletos, contraditórios ou difíceis de entender para o visitante.
+- 41 a 60: há uma base funcional, porém com lacunas importantes que prejudicam a compreensão, a confiança, a utilidade ou o próximo passo.
+- 61 a 80: o pilar está relativamente bem organizado e cumpre boa parte da função, mas ainda existem melhorias claras e específicas.
+- 81 a 100: o pilar está muito bem estruturado, coerente e sustentado por evidências suficientes. Não dê notas próximas de 100 por elogio, potencial ou boa intenção.
+
+Critérios específicos:
+
+CLAREZA
+Avalie se a primeira impressão responde, com rapidez, o que a empresa oferece, para quem, em qual região ou formato atende quando isso for relevante, e o que o visitante deve fazer em seguida. Considere nome de exibição, bio, categoria, link e coerência entre a promessa da bio e o conteúdo visível. Se os prints não mostrarem esses elementos, não presuma que estão corretos ou incorretos.
+
+CREDIBILIDADE
+Avalie se há sinais verificáveis de confiança: apresentação do responsável ou da empresa, demonstração de conhecimento, explicação do processo, bastidores pertinentes, avaliações ou depoimentos reais quando disponíveis, informações úteis sobre atendimento e consistência entre o que promete e o que mostra. Não confunda aparência bonita com credibilidade. Não recomende inventar depoimentos ou fabricar provas.
+
+CONTEÚDO
+Avalie se os conteúdos observáveis e as respostas fornecidas cumprem funções diferentes: atrair pessoas compatíveis, esclarecer dúvidas, demonstrar valor, responder objeções, mostrar processo e orientar uma próxima ação. Considere variedade de intenção, especificidade, adequação ao público e ligação com a oferta. Não atribua nota apenas pela frequência de postagem.
+
+CONVERSÃO
+Avalie a facilidade do caminho entre descobrir o perfil e executar a ação que o negócio deseja: entender a oferta, encontrar informações essenciais, identificar o canal correto, saber o que escrever ou fazer e avançar para compra, orçamento, agendamento, visita ou atendimento. A recomendação precisa respeitar o canal e o objetivo principal informados no questionário. Não force WhatsApp, site ou compra online quando isso não corresponder ao modelo do negócio.
+
+CONSISTÊNCIA
+Avalie a sustentabilidade da rotina, não a quantidade de publicações. Cruze frequência declarada, disponibilidade semanal, tempo que a pessoa diz conseguir dedicar, energia, obstáculos relatados e preferência de exposição. Uma rotina menor, mas executável, pode representar melhor organização do que uma frequência alta e impossível de manter.
+
+Para cada pilar, a leitura deve conter:
+- Nota atribuída.
+- Evidência ou resposta que sustentou a avaliação.
+- O que já está funcionando.
+- Principal lacuna ou oportunidade.
+- Uma ação prioritária que pode elevar a organização daquele pilar.
+- Limite da análise, quando não houver evidência suficiente.
+
+Não repita a mesma justificativa em cinco pilares. Mostre a diferença entre eles e explique quando um problema afeta mais de um pilar por razões distintas.
+
+3. DIAGNÓSTICO DO CAMINHO DO CLIENTE
+
+Analise o Instagram pela perspectiva de alguém que ainda não conhece o negócio. Reconstrua, com base no que foi informado e no que é visível, este percurso:
+
+A. DESCOBERTA: a pessoa consegue identificar rapidamente se aquele perfil tem relação com sua necessidade?
+B. COMPREENSÃO: entende o que é oferecido, para quem é e qual problema, desejo ou situação a solução atende?
+C. CONFIANÇA: encontra razões reais para acreditar que a empresa pode entregar o que comunica?
+D. DECISÃO: consegue esclarecer as dúvidas e objeções mais comuns antes de comprar?
+E. AÇÃO: sabe exatamente como comprar, pedir orçamento, agendar, visitar, chamar ou dar o próximo passo?
+
+Identifique em qual etapa está o maior atrito. Não conclua automaticamente que o problema é falta de conteúdo. O gargalo pode ser uma oferta mal explicada, informações ausentes, baixa demonstração de confiança, objeções não respondidas, canal de contato confuso ou rotina inviável.
+
+Ao recomendar uma correção, explique como ela reduz o atrito daquela etapa. A recomendação deve corresponder ao objetivo principal selecionado pela pessoa na pergunta sobre a ação desejada do visitante.
+
+4. POSICIONAMENTO, PROPOSTA DE VALOR E BIO
+
+A frase de posicionamento não deve ser um slogan genérico. Ela precisa sintetizar:
+- O que o negócio oferece.
+- Para quem ou em qual situação atende.
+- Qual valor, método, especialidade ou diferencial informado torna a oferta relevante.
+- O contexto local ou formato de atendimento, se isso for decisivo.
+
+Não invente uma promessa de transformação que o negócio não declarou ou não consegue comprovar. Diferencie atributo, benefício e prova: atributo é uma característica da oferta; benefício é a utilidade para o cliente; prova é uma evidência real de que a empresa sustenta o que afirma.
+
+As três bios devem cumprir papéis estratégicos diferentes, e não ser apenas três versões quase idênticas:
+- Bio 1: clareza imediata da oferta e do público.
+- Bio 2: ênfase no diferencial ou especialidade que foi informado e pode ser sustentado.
+- Bio 3: orientação mais direta para a ação principal desejada pelo negócio.
+
+Cada bio deve ser pronta para copiar, natural, específica e dentro de 150 caracteres. Conte espaços, pontuação, emojis e quebras de linha no limite. Não coloque afirmações sem comprovação. Se a localização for relevante, use somente a região fornecida. A chamada para ação deve combinar com o canal real de atendimento e com a jornada de compra.
+
+5. DESTAQUES COMO NAVEGAÇÃO DO PERFIL
+
+Os cinco ou seis destaques sugeridos devem formar uma pequena navegação para quem chega ao perfil. Não escolha nomes apenas porque parecem bonitos.
+
+Considere, de acordo com o negócio:
+- Comece aqui / apresentação.
+- Serviços, produtos ou soluções.
+- Como funciona / processo / atendimento.
+- Resultados, avaliações ou clientes, somente se houver material real.
+- Dúvidas frequentes / informações práticas.
+- Localização, agenda, catálogo ou contato, conforme o modelo de negócio.
+
+Não use todos esses títulos automaticamente. Escolha apenas os que fazem sentido para aquele negócio. Para cada destaque, explique sua função para o visitante, quais stories devem entrar, em qual ordem e qual dúvida ele ajuda a resolver. Nomes devem ser curtos, claros e ter até 10 caracteres, conforme exigido anteriormente. Evite duplicidade de função entre destaques.
+
+6. PUBLICAÇÕES FIXADAS COMO RECEPÇÃO ESTRATÉGICA
+
+As três publicações fixadas devem funcionar como uma sequência coerente para um visitante novo, e não como três conteúdos independentes.
+
+- FIXADO 1 — IDENTIFICAÇÃO: a pessoa reconhece o negócio, entende o que oferece, para quem e em qual situação pode ajudar.
+- FIXADO 2 — VALOR E SOLUÇÃO: a pessoa entende um problema, desejo ou necessidade que o negócio atende, como funciona a solução e o diferencial que pode ser sustentado.
+- FIXADO 3 — CONFIANÇA E PRÓXIMO PASSO: a pessoa encontra processo, bastidor, esclarecimento de dúvida, prova disponível ou orientação prática para agir.
+
+Para cada publicação, aprofunde:
+- Objetivo dentro da jornada do cliente.
+- Perfil de pessoa a quem se destina.
+- Gancho específico que faz sentido para aquele segmento.
+- Desenvolvimento em sequência lógica, sem depender de frases genéricas.
+- O que deve aparecer visualmente em cada cena, tela ou slide.
+- Texto de tela, quando adequado.
+- Fechamento e CTA alinhados ao canal de compra ou atendimento.
+- Legenda pronta que complemente o conteúdo, em vez de apenas repetir o roteiro.
+- Recursos necessários e alternativa de execução compatível com a preferência de exposição da pessoa.
+
+Se a pessoa não quiser aparecer, proponha gravação de mãos, produto, ambiente, tela, narração, texto, demonstração, imagens do processo ou carrossel, quando adequado. Não force presença em câmera.
+
+7. NOVE IDEIAS ADICIONAIS COMO SISTEMA EDITORIAL
+
+As nove ideias não devem ser nove variações do mesmo assunto. Construa um conjunto equilibrado, adaptado ao negócio e às objeções relatadas. Sempre que fizer sentido, cubra:
+- Descoberta: conteúdo que ajuda pessoas compatíveis a reconhecer uma necessidade ou situação.
+- Educação: explicação útil sobre o produto, serviço, processo ou problema atendido.
+- Autoridade demonstrável: raciocínio, método, experiência ou conhecimento que a empresa realmente possui.
+- Quebra de objeção: resposta a uma dúvida, receio ou barreira relatada no questionário.
+- Bastidores e processo: o que acontece antes, durante ou depois da entrega, sem expor informações privadas.
+- Relacionamento: conteúdo que revela valores, escolhas, visão ou proximidade de maneira autêntica.
+- Prova social: somente quando existirem registros, avaliações ou depoimentos fornecidos; se não houver, use demonstração de processo, não prova inventada.
+- Oferta e conversão: explicar como funciona, para quem é, como comprar, agendar ou solicitar atendimento.
+- Reforço de posicionamento: conteúdo que deixa claro o que a marca defende, faz ou faz de um jeito próprio, se isso estiver sustentado pelas respostas.
+
+Não force exatamente uma categoria por ideia quando isso deixar o conjunto artificial. O importante é cobrir funções diferentes e não repetir tema, gancho ou argumento.
+
+Para cada ideia, detalhe:
+- Qual dúvida, desejo, objeção ou etapa da jornada ela atende.
+- Gancho ou primeira frase que pode ser usada.
+- O que mostrar, explicar ou demonstrar.
+- Desenvolvimento concreto e específico para o negócio.
+- CTA apropriado, sem pedir compra em toda publicação.
+- Formato e esforço de produção.
+- Como executar respeitando a preferência de exposição e os recursos mencionados.
+
+Essas informações adicionais devem ser incorporadas ao campo existente "ideia" e, quando útil, ao campo "objetivo". Não crie novas chaves no JSON.
+
+8. PLANO MACRO E PLANNER DEVEM CONVERSAR ENTRE SI
+
+A sequência das quatro semanas precisa refletir o gargalo prioritário identificado. A organização de semanas pode seguir a lógica organizar, estruturar, produzir e ajustar, mas adapte essa ordem quando o negócio tiver uma urgência diferente.
+
+O plano macro deve explicar a mudança de organização que se deseja construir em cada semana. As ações devem ser marcos estratégicos, não tarefas vagas.
+
+O planner de 30 dias deve converter esses marcos em tarefas concretas. Cada tarefa deve:
+- Ter relação evidente com o foco da semana.
+- Ter uma entrega verificável.
+- Ser pequena o suficiente para caber na duração informada.
+- Considerar dependências: não agendar publicação antes de definir pauta e preparar material, por exemplo.
+- Evitar repetir tarefas com palavras diferentes.
+- Incluir ações de observação e revisão, não apenas produção.
+- Incluir descanso e flexibilidade quando a rotina exigir.
+
+Não use a disponibilidade como mero detalhe. Ela deve alterar efetivamente o número, o tamanho e a distribuição das tarefas. Se a pessoa informou pouco tempo, não crie um planner ambicioso e depois tente justificar a sobrecarga. Se a janela for de 30 minutos, a tarefa não pode exigir 60 minutos.
+
+A tarefa diária deve dizer o que fazer e qual resultado deixar pronto. Exemplos de especificidade:
+- Em vez de "melhorar a bio": "Reescrever a bio com oferta, público e CTA; conferir se cabe em 150 caracteres".
+- Em vez de "fazer conteúdo": "Roteirizar um vídeo de até 30 segundos respondendo à dúvida sobre prazo de entrega".
+- Em vez de "organizar destaques": "Separar cinco stories reais de apresentação e montar o destaque Comece".
+Use exemplos apenas quando forem adequados ao negócio analisado.
+
+9. MOCKUP: COERÊNCIA VISUAL E EDITORIAL
+
+O mockup é uma representação ilustrativa das recomendações, não uma afirmação de que o perfil já foi alterado.
+
+Verifique:
+- Nome de exibição e categoria compatíveis com o negócio e com o que foi informado.
+- Bio do mockup igual à melhor opção recomendada, preservando o texto e a ordem das linhas.
+- CTA correspondente à ação principal desejada e ao canal real.
+- Os mesmos destaques, com os mesmos nomes e emojis, sem introduzir um novo destaque.
+- Nove capas legíveis, curtas e distintas.
+- As três primeiras capas devem corresponder aos três posts fixados na mesma ordem.
+- As outras seis capas devem corresponder a seis das nove ideias adicionais, priorizando as ideias que formam a melhor sequência editorial.
+- Formatos coerentes com os posts e com a preferência de exposição.
+
+Não invente nome, categoria, localização, seguidores, resultados ou qualquer informação. Quando a categoria não puder ser identificada com segurança, use a descrição mais neutra sustentada pelas respostas.
+
+10. PERSONALIZAÇÃO E TOM DE VOZ
+
+Use as expressões e a forma de falar da pessoa como pistas para construir um tom de comunicação autêntico, mas não imite erros de escrita nem exponha respostas pessoais de maneira constrangedora.
+
+As recomendações devem respeitar:
+- O grau de formalidade adequado ao público.
+- A maneira como a pessoa naturalmente explica, acolhe, orienta ou resolve.
+- A preferência de aparecer ou não.
+- A energia e o tempo realmente disponíveis.
+- A etapa atual do negócio e sua capacidade real de atendimento.
+
+Não transforme todo negócio em uma marca descontraída, provocativa, premium ou técnica por padrão. A personalidade da marca deve emergir das respostas, do público e da oferta.
+
+11. PRIORIDADE E TRADE-OFFS
+
+Quando identificar vários problemas, não trate todos como igualmente urgentes. Escolha um gargalo principal e até dois gargalos secundários. Explique por que o principal vem primeiro.
+
+Se uma recomendação depender de algo que ainda não existe — por exemplo, depoimentos, fotos de clientes, catálogo, site, link de agendamento ou material de bastidor — não aja como se esse recurso estivesse pronto. Indique a preparação necessária ou ofereça uma alternativa viável.
+
+Priorize mudanças que possam ser executadas com os recursos já informados. Não prescreva anúncios pagos, contratação, ferramentas pagas, produção profissional ou investimento sem que exista justificativa e capacidade declarada.
+
+12. CONTROLE DE CONSISTÊNCIA ENTRE CAMPOS
+
+Antes de finalizar, compare os campos entre si:
+- resumo, leitura e pontuações precisam contar a mesma história.
+- espelho precisa influenciar de verdade o posicionamento, a bio, os formatos, as pautas e a rotina.
+- pontos de atenção precisam encontrar respostas concretas nas bios, destaques, posts ou planner.
+- posicionamento, bio e CTA não podem comunicar ofertas diferentes.
+- posts fixados e ideias adicionais não podem repetir a mesma pauta.
+- plano macro e planner precisam ser etapas da mesma estratégia.
+- mockup precisa representar exatamente o que foi recomendado.
+- rotina semanal não pode contradizer horários, dias ou frequência do planner.
+- todo conteúdo com prova social precisa estar apoiado por material real fornecido.
+- nenhuma recomendação pode contradizer a preferência de exposição da pessoa.
+
+Se houver conflito, priorize os dados explícitos do questionário, a evidência visual legível e os limites de execução informados. Ajuste a recomendação menos fundamentada.
+
+13. USO DO QUESTIONÁRIO E DOS PRINTS
+
+Percorra todas as respostas disponíveis, não apenas as primeiras perguntas. Dê atenção especial:
+- às respostas 1 a 9 para compreender negócio, oferta, diferenciais e contexto;
+- às respostas 10 a 15 para entender público, desejo, dúvidas, objeções e razões de escolha;
+- às respostas 16 a 25 e ao print para avaliar o uso atual do Instagram, frequência, conteúdo, destaques, fixados, contatos e provas disponíveis;
+- às respostas 26 a 29 para priorizar objetivos, ação desejada, tempo e expectativa para 30 dias;
+- às respostas 31 a 36 para personalizar a interpretação pessoa + negócio;
+- à resposta 37 para construir a rotina realista do planner.
+
+Esses números identificam os campos do questionário atual. Se algum campo vier vazio, ausente ou sem resposta, não invente o conteúdo. Use o que estiver disponível e registre a limitação de forma natural. Não reproduza a resposta inteira da pessoa sem necessidade.
+
+14. VERIFICAÇÃO FINAL COMPLEMENTAR
+
+Além da verificação final já definida anteriormente, confira silenciosamente:
+
+1. Os cinco pilares foram avaliados com critérios próprios, sem notas arbitrárias ou justificativas repetidas?
+2. Cada nota está ligada a dados ou evidências e não mede potencial de faturamento?
+3. O principal atrito da jornada do cliente foi identificado?
+4. As bios são realmente distintas, copiáveis e têm no máximo 150 caracteres cada?
+5. Os destaques funcionam como navegação e não repetem a mesma função?
+6. Os três posts fixados formam uma sequência de recepção, valor e confiança/ação?
+7. As nove ideias cobrem funções diferentes e respondem ao público e às objeções reais?
+8. O plano de quatro semanas e o planner de 30 dias formam uma única rota executável?
+9. O planner respeita integralmente disponibilidade, tempo e preferência de exposição?
+10. O mockup corresponde fielmente às recomendações, sem inventar informações?
+11. Todos os campos contam a mesma história e priorizam o gargalo central?
+12. O relatório entrega exemplos que podem ser usados, e não apenas conselhos abstratos?
+
+Se qualquer item falhar, revise o conteúdo correspondente antes de responder. Preserve integralmente a estrutura JSON e todas as quantidades obrigatórias definidas acima. Não crie propriedades novas, não remova propriedades e não acrescente texto fora do JSON.
+
 `;
 
 const pickJSON = (text) => {
