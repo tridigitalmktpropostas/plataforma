@@ -262,7 +262,21 @@ module.exports = async (req, res) => {
       return json(res, 200, { ok: true, ignored: true, reason: "Evento sem order_id." });
     }
 
-    const isMivProduct = !configuredProductId || productId === configuredProductId;
+    let isMivProduct = !configuredProductId || productId === configuredProductId;
+    // Compatibilidade caso KIWIFY_PRODUCT_ID ainda não esteja definido:
+    // produtos adicionais devem ser cadastrados no catálogo antes do primeiro webhook.
+    if (!configuredProductId && productId) {
+      const catalogLookup = await fetch(
+        `${supabaseUrl}/rest/v1/miv_products?kiwify_product_id=eq.${encodeURIComponent(productId)}&select=kiwify_product_id&limit=1`,
+        { headers }
+      );
+      const catalogRows = await catalogLookup.json().catch(() => []);
+      if (!catalogLookup.ok || !Array.isArray(catalogRows)) {
+        console.error("Não foi possível identificar o produto no catálogo MIV:", catalogRows);
+        throw new Error("Não foi possível identificar o produto desta compra.");
+      }
+      if (catalogRows.length > 0) isMivProduct = false;
+    }
     const isRefund =
       eventType.includes("refund") ||
       orderStatus.includes("refund") ||
