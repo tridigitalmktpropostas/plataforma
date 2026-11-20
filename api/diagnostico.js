@@ -1166,15 +1166,30 @@ module.exports = async (req, res) => {
           ))
         : {};
 
-    provider =
-      process.env.AI_PROVIDER ||
-      (process.env.OPENAI_API_KEY ? "openai" : "anthropic");
+    // Prefere o provedor explicitamente configurado, mas faz fallback seguro
+    // para a outra chave disponível. Isso evita selecionar Anthropic por engano
+    // quando AI_PROVIDER=anthropic está definido sem ANTHROPIC_API_KEY.
+    const requestedProvider = String(process.env.AI_PROVIDER || "").trim().toLowerCase();
+    const hasOpenAIKey = Boolean(String(process.env.OPENAI_API_KEY || "").trim());
+    const hasAnthropicKey = Boolean(String(process.env.ANTHROPIC_API_KEY || "").trim());
 
-    if (provider === "openai" && !process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ erro: "OPENAI_API_KEY não configurada na Vercel." });
+    if (requestedProvider === "openai" && hasOpenAIKey) {
+      provider = "openai";
+    } else if (requestedProvider === "anthropic" && hasAnthropicKey) {
+      provider = "anthropic";
+    } else if (hasOpenAIKey) {
+      provider = "openai";
+    } else if (hasAnthropicKey) {
+      provider = "anthropic";
+    } else {
+      console.error("Nenhum provedor de IA está configurado no ambiente da Vercel.");
+      return res.status(500).json({
+        erro: "Nenhuma chave de IA está configurada neste ambiente da Vercel. Configure OPENAI_API_KEY ou ANTHROPIC_API_KEY em Settings → Environment Variables, incluindo Preview e Production.",
+      });
     }
-    if (provider !== "openai" && !process.env.ANTHROPIC_API_KEY) {
-      return res.status(500).json({ erro: "ANTHROPIC_API_KEY não configurada na Vercel." });
+
+    if (requestedProvider && requestedProvider !== provider) {
+      console.warn("AI_PROVIDER solicitado não tem chave disponível; usando o provedor configurado:", provider);
     }
 
     // Reserva a chave uma única vez para as duas etapas.
