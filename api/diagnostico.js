@@ -783,6 +783,29 @@ module.exports = async (req, res) => {
     });
   };
 
+  const fetchAccessRecord = async (select) => {
+    const url = supabaseUrl + "/rest/v1/miv_access_keys?access_key=eq." +
+      encodeURIComponent(accessKey) + "&select=" + encodeURIComponent(select || "*") + "&limit=1";
+    const response = await fetch(url, { method: "GET", headers: {
+      apikey: supabaseSecret, Authorization: "Bearer " + supabaseSecret,
+    }});
+    const data = await response.json().catch(() => []);
+    if (!response.ok) {
+      console.error("Erro ao consultar registro MIV:", data);
+      throw new Error("Não foi possível consultar seu acesso.");
+    }
+    return Array.isArray(data) ? data[0] || null : null;
+  };
+
+  const savePlannerState = async (completed) => {
+    const response = await updateKey({ planner_progress: { completed } }, "&status=eq.used");
+    const data = await response.json().catch(() => []);
+    if (!response.ok || !Array.isArray(data) || data.length === 0) {
+      console.error("Erro ao salvar progresso do planner:", data);
+      throw new Error("Não foi possível salvar seu progresso. Tente novamente.");
+    }
+  };
+
   const sendEvent = (event) => {
     if (streamStarted && !res.writableEnded) {
       res.write(JSON.stringify(event) + "\n");
@@ -1018,6 +1041,8 @@ module.exports = async (req, res) => {
       qa,
       imgs,
       accessKey: submittedKey,
+      answersSnapshot,
+      consent,
     } = req.body || {};
 
     accessKey = String(submittedKey || "").trim();
@@ -1038,38 +1063,75 @@ module.exports = async (req, res) => {
       });
     }
 
-    // A validação permanece separada da geração e não consome a chave.
+    // Valida sem consumir: disponível inicia; usada com relatório salvo retoma.
     if (action === "validate") {
-      const checkUrl =
-        supabaseUrl +
-        "/rest/v1/miv_access_keys?access_key=eq." +
-        encodeURIComponent(accessKey) +
-        "&status=eq.available&select=access_key";
-
-      const checkResponse = await fetch(checkUrl, {
-        method: "GET",
-        headers: {
-          apikey: supabaseSecret,
-          Authorization: "Bearer " + supabaseSecret,
-        },
+      const record = await fetchAccessRecord("access_key,status,report_json,access_expires_at,planner_progress");
+      if (!record || ["refunded", "chargeback"].includes(record.status)) {
+        return res.status(401).json({ valid: false, erro: "Chave inválida ou compra reembolsada." });
+      }
+      if (record.status === "available") return res.status(200).json({ valid: true, hasReport: false });
+      if (record.status === "used" && record.report_json) {
+        const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
+        if (!expiry || Number.isNaN(expiry.getTime()) || expiry <= new Date()) {
+          return res.status(410).json({ valid: false, expired: true, erro: "Seu período de acompanhamento de 30 dias terminou." });
+        }
+        return res.status(200).json({ valid: true, hasReport: true, expiresAt: expiry.toISOString() });
+      }
+      if (record.status === "processing") {
+        return res.status(409).json({ valid: false, erro: "Seu diagnóstico ainda está sendo processado. Aguarde alguns minutos e tente novamente." });
+      }
+      return res.status(401).json({
+        valid: false,
+        erro: "Esta chave foi utilizada em uma versão anterior e o relatório não está disponível para retomada. Entre em contato com a Tri Digital.",
       });
+    }
 
-      const checkData = await checkResponse.json().catch(() => []);
-      if (!checkResponse.ok) {
-        console.error("Erro ao validar chave:", checkData);
-        throw new Error("Não foi possível validar a chave no Supabase.");
+    if (action === "resume") {
+      const record = await fetchAccessRecord("status,report_json,form_answers_json,planner_progress,access_expires_at");
+      if (!record || record.status !== "used" || !record.report_json) {
+        return res.status(404).json({ erro: "Não encontramos um relatório salvo para esta chave." });
       }
-      if (!Array.isArray(checkData) || checkData.length === 0) {
-        return res.status(401).json({
-          erro: "Chave inválida, já utilizada ou indisponível.",
-        });
+      const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
+      if (!expiry || Number.isNaN(expiry.getTime()) || expiry <= new Date()) {
+        return res.status(410).json({ erro: "Seu período de acompanhamento de 30 dias terminou." });
       }
-      return res.status(200).json({ valid: true });
+      return res.status(200).json({
+        report: record.report_json,
+        answers: record.form_answers_json || {},
+        progress: record.planner_progress || { completed: [] },
+        expiresAt: expiry.toISOString(),
+      });
+    }
+
+    if (action === "save_progress") {
+      const record = await fetchAccessRecord("status,report_json,access_expires_at");
+      if (!record || record.status !== "used" || !record.report_json) {
+        return res.status(401).json({ saved: false, erro: "Acesso indisponível." });
+      }
+      const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
+      if (!expiry || expiry <= new Date()) {
+        return res.status(410).json({ saved: false, erro: "Seu período de acompanhamento terminou." });
+      }
+      const input = Array.isArray(req.body?.completed) ? req.body.completed : [];
+      const completed = [...new Set(input.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n < 30))].sort((a,b)=>a-b);
+      await savePlannerState(completed);
+      return res.status(200).json({ saved: true, completed });
     }
 
     if (!Array.isArray(qa) || qa.length > 40) {
       return res.status(400).json({ erro: "Dados inválidos" });
     }
+    if (!consent || consent.privacyAcknowledged !== true) {
+      return res.status(400).json({ erro: "Leia e confirme o Aviso de Privacidade antes de gerar seu MIV." });
+    }
+    const safeAnswersSnapshot =
+      answersSnapshot && typeof answersSnapshot === "object" && !Array.isArray(answersSnapshot)
+        ? Object.fromEntries(Object.entries(answersSnapshot).filter(([key, value]) =>
+            /^([1-9]|[12][0-9]|3[0-7])$/.test(key) &&
+            (typeof value === "string" || typeof value === "number" || typeof value === "boolean" ||
+             Array.isArray(value) || (value && typeof value === "object"))
+          ))
+        : {};
 
     provider =
       process.env.AI_PROVIDER ||
@@ -1201,27 +1263,71 @@ module.exports = async (req, res) => {
 
     const finalResult = Object.assign({}, diagnostic, actionPlan);
 
-    // A chave só é consumida quando as duas etapas estão prontas.
-    const consumeResponse = await updateKey(
-      {
-        status: "used",
-        used_at: new Date().toISOString(),
-      },
-      "&status=eq.processing"
-    );
-    const consumeData = await consumeResponse.json().catch(() => []);
+    // Salva o relatório e a data de expiração na mesma operação que consome a chave.
+    const generatedAt = new Date();
+    const expiresAt = new Date(generatedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const researchConsent = Boolean(consent && consent.researchConsent === true);
+    const persistResponse = await updateKey({
+      status: "used",
+      used_at: generatedAt.toISOString(),
+      generated_at: generatedAt.toISOString(),
+      access_expires_at: expiresAt.toISOString(),
+      report_json: finalResult,
+      questionnaire_json: validQA,
+      form_answers_json: safeAnswersSnapshot,
+      planner_progress: { completed: [] },
+      privacy_acknowledged_at: generatedAt.toISOString(),
+      privacy_notice_version: "2026-11-20-v1",
+      research_consent: researchConsent,
+      research_consent_at: researchConsent ? generatedAt.toISOString() : null,
+    }, "&status=eq.processing");
+    const persisted = await persistResponse.json().catch(() => []);
+    if (!persistResponse.ok || !Array.isArray(persisted) || persisted.length === 0) {
+      console.error("Erro ao salvar relatório no Supabase:", persisted);
+      throw new Error("O relatório foi gerado, mas não foi possível salvá-lo. Sua chave será liberada para tentar novamente.");
+    }
+    keyReserved = false;
 
-    if (
-      !consumeResponse.ok ||
-      !Array.isArray(consumeData) ||
-      consumeData.length === 0
-    ) {
-      console.error("Erro ao finalizar consumo da chave:", consumeData);
-      throw new Error("O relatório foi gerado, mas não foi possível finalizar a chave.");
+    // A base de pesquisa recebe somente categorias fechadas e notas, nunca textos livres,
+    // identificadores, e-mail, @, localização, imagens ou chave de acesso.
+    if (researchConsent) {
+      const q = safeAnswersSnapshot;
+      const p = finalResult.pontuacao || {};
+      const researchRow = {
+        month_bucket: generatedAt.toISOString().slice(0, 7) + "-01",
+        operating_format: typeof q["5"] === "string" ? q["5"] : null,
+        customer_age_band: typeof q["11"] === "string" ? q["11"] : null,
+        posting_frequency: typeof q["17"] === "string" ? q["17"] : null,
+        stories_frequency: typeof q["18"] === "string" ? q["18"] : null,
+        appearance_preference: typeof q["19"] === "string" ? q["19"] : null,
+        conversion_goal: typeof q["27"] === "string" ? q["27"] : null,
+        weekly_time_budget: typeof q["28"] === "string" ? q["28"] : null,
+        score_clareza: Number(p.clareza),
+        score_credibilidade: Number(p.credibilidade),
+        score_conteudo: Number(p.conteudo),
+        score_conversao: Number(p.conversao),
+        score_consistencia: Number(p.consistencia),
+      };
+      try {
+        const researchResponse = await fetch(supabaseUrl + "/rest/v1/miv_research_snapshots", {
+          method: "POST",
+          headers: { ...supabaseHeaders(), Prefer: "return=minimal" },
+          body: JSON.stringify(researchRow),
+        });
+        if (!researchResponse.ok) {
+          console.error("Relatório salvo, mas pesquisa opcional não foi registrada:", await researchResponse.text().catch(()=>""));
+        }
+      } catch (researchError) {
+        console.error("Relatório salvo, mas pesquisa opcional falhou:", researchError);
+      }
     }
 
-    keyReserved = false;
-    sendEvent({ type: "result", data: finalResult });
+    sendEvent({
+      type: "result",
+      data: finalResult,
+      expiresAt: expiresAt.toISOString(),
+      progress: { completed: [] },
+    });
     res.end();
 
   } catch (error) {
