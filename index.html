@@ -228,10 +228,139 @@ const sec=(t,sub,b)=>`<section class="sec rv"><h3>${t}</h3>${sub?`<p class="sub"
 const li=a=>L(a).map(x=>`<li>${esc(x)}</li>`).join("");
 function shrink(f){return new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",.8))};i.onerror=()=>r(null);i.src=URL.createObjectURL(f)})}
 function loading(){
- $("resultPanel").innerHTML=`<div class="ld"><div class="spin"></div><h2 id="ldt">Analisando suas respostas…</h2><p class="intro" style="margin:0 auto 22px">Estamos montando seu diagnóstico com calma. Isso leva cerca de 1 a 2 minutos — não feche esta página.</p><div class="progress"><div class="bar" id="ldb" style="width:5%"></div></div></div>`;
- const m=["Lendo o que você contou sobre o negócio…","Entendendo quem é seu cliente…","Olhando seu perfil atual…","Desenhando bio e destaques…","Pensando nos posts…","Montando a prévia do seu Instagram…"];let i=0,p=5;
- return setInterval(()=>{$("ldt").textContent=m[i++%m.length];p=Math.min(92,p+6);$("ldb").style.width=p+"%"},4500);
+ const messagesByPhase={
+  1:[
+   "Lendo o que você contou sobre o negócio…",
+   "Entendendo o perfil de cliente e as decisões de compra…",
+   "Analisando os cinco pilares do MIV…",
+   "Conectando negócio, Instagram e pessoa…"
+  ],
+  2:[
+   "Construindo o posicionamento e as opções de bio…",
+   "Organizando destaques e publicações estratégicas…",
+   "Criando ideias de conteúdo e roteiros…",
+   "Montando as quatro semanas e o planner de 30 dias…",
+   "Preparando a prévia visual do seu Instagram…"
+  ]
+ };
+ $("resultPanel").innerHTML=
+  '<div class="ld" style="max-width:720px;margin:auto;padding:65px 12px">' +
+   '<div class="spin"></div>' +
+   '<div id="ldstage" style="display:inline-block;margin:14px 0 8px;padding:6px 12px;border-radius:99px;background:#f2eafb;color:#7042ab;font-size:10px;font-weight:900;letter-spacing:.1em">ETAPA 1 DE 2</div>' +
+   '<h2 id="ldt">Etapa 1 — Diagnóstico estratégico</h2>' +
+   '<p class="intro" id="ldmsg" style="margin:0 auto 22px">Analisando seu negócio, seu cliente, seu Instagram e os cinco pilares do MIV.</p>' +
+   '<div class="progress" style="max-width:520px;margin:18px auto 12px"><div class="bar" id="ldb" style="width:4%"></div></div>' +
+   '<div style="display:flex;justify-content:space-between;max-width:520px;margin:0 auto;color:#82788e;font-size:10px;font-weight:800">' +
+    '<span id="ldstep1" style="color:#7042ab">● 1. Diagnóstico</span><span id="ldstep2">○ 2. Plano de ação</span>' +
+   '</div>' +
+   '<p style="max-width:480px;margin:24px auto 0;color:#92899b;font-size:11px">O processo tem duas análises completas. Ao terminar a primeira, a segunda começa automaticamente. Não feche esta página.</p>' +
+  '</div>';
+ let phase=1;
+ let progress=4;
+ let messageIndex=0;
+ let interval=null;
+ const setBar=()=>{const bar=$("ldb");if(bar)bar.style.width=progress+"%";};
+ const setPhase=(nextPhase,message)=>{
+  phase=nextPhase;
+  progress=nextPhase===1?4:3;
+  messageIndex=0;
+  $("ldstage").textContent=nextPhase===1?"ETAPA 1 DE 2":"ETAPA 2 DE 2";
+  $("ldt").textContent=nextPhase===1?"Etapa 1 — Diagnóstico estratégico":"Etapa 2 — Plano de ação e mockup";
+  $("ldmsg").textContent=message||(messagesByPhase[nextPhase]||[])[0]||"Preparando a próxima etapa…";
+  $("ldstep1").textContent="● 1. Diagnóstico";
+  $("ldstep1").style.color=nextPhase===1?"#7042ab":"#28845f";
+  $("ldstep2").textContent=nextPhase===1?"○ 2. Plano de ação":"● 2. Plano de ação";
+  $("ldstep2").style.color=nextPhase===2?"#7042ab":"#82788e";
+  setBar();
+ };
+ interval=setInterval(()=>{
+  const cap=phase===1?46:93;
+  progress=Math.min(cap,progress+(phase===1?1.4:1.05));
+  setBar();
+  const messages=messagesByPhase[phase]||[];
+  if(messages.length){
+   messageIndex=(messageIndex+1)%messages.length;
+   const msg=$("ldmsg");
+   if(msg&&messageIndex===0)msg.textContent=messages[0];
+   else if(msg&&Math.random()<.22)msg.textContent=messages[messageIndex];
+  }
+ },1800);
+ return {
+  update(event){
+   if(!event||event.type!=="progress")return;
+   if(event.phase===2&&phase!==2){
+    setPhase(2,event.message);
+    return;
+   }
+   if(event.phase===1&&event.status==="completed"){
+    progress=48;setBar();
+    $("ldstage").textContent="ETAPA 1 CONCLUÍDA";
+    $("ldt").textContent="Diagnóstico estratégico concluído";
+    $("ldmsg").textContent=event.message||"Agora vamos transformar a análise em um plano prático.";
+   }else if(event.message){
+    $("ldmsg").textContent=event.message;
+   }
+  },
+  stop(){if(interval)clearInterval(interval);interval=null;}
+ };
 }
+
+async function readMivStream(response, loadingUi){
+ if(!response.ok){
+  const errorData=await response.json().catch(()=>({}));
+  throw new Error(errorData.erro||"Não foi possível iniciar a geração do MIV.");
+ }
+ const contentType=(response.headers.get("content-type")||"").toLowerCase();
+ if(!contentType.includes("application/x-ndjson")){
+  const data=await response.json().catch(()=>null);
+  if(!data||!data.resumo)throw new Error("A resposta da IA veio incompleta.");
+  return data;
+ }
+ if(!response.body||typeof response.body.getReader!=="function"){
+  throw new Error("Seu navegador não conseguiu acompanhar a geração em duas etapas. Atualize a página e tente novamente.");
+ }
+ const reader=response.body.getReader();
+ const decoder=new TextDecoder();
+ let buffer="";
+ let finalResult=null;
+ let streamError=null;
+ function handleLine(line){
+  const trimmed=line.trim();
+  if(!trimmed)return;
+  let event;
+  try{event=JSON.parse(trimmed);}
+  catch(error){throw new Error("Recebemos uma atualização inválida do servidor. Tente novamente.");}
+  if(event.type==="progress"){
+   loadingUi.update(event);
+  }else if(event.type==="result"){
+   finalResult=event.data;
+  }else if(event.type==="error"){
+   streamError=new Error(event.erro||"Não foi possível concluir as duas etapas do MIV.");
+  }
+ }
+ while(true){
+  const chunk=await reader.read();
+  if(chunk.done)break;
+  buffer+=decoder.decode(chunk.value,{stream:true});
+  const lines=buffer.split(/\r?\n/);
+  buffer=lines.pop()||"";
+  for(const line of lines){
+   handleLine(line);
+   if(streamError){
+    try{await reader.cancel();}catch(ignore){}
+    throw streamError;
+   }
+  }
+ }
+ buffer+=decoder.decode();
+ if(buffer.trim())handleLine(buffer);
+ if(streamError)throw streamError;
+ if(!finalResult||!finalResult.resumo){
+  throw new Error("A geração terminou sem entregar o relatório completo. Sua chave será liberada para uma nova tentativa.");
+ }
+ return finalResult;
+}
+
 async function generate(){
  if(!validatedAccessKey){
   $("resultPanel").style.display="none";
@@ -240,15 +369,32 @@ async function generate(){
   $("accessError").textContent="Valide sua chave de acesso antes de gerar o diagnóstico.";
   return;
  }
- $("formPanel").style.display="none";document.querySelector(".side").style.display="none";document.querySelector(".layout").style.display="block";$("resultPanel").style.display="block";scrollTo(0,0);
- const tm=loading();
+ $("formPanel").style.display="none";
+ document.querySelector(".side").style.display="none";
+ document.querySelector(".layout").style.display="block";
+ $("resultPanel").style.display="block";
+ scrollTo(0,0);
+ const loadingUi=loading();
  try{
-  const qa=Object.entries(questions).filter(([id,q])=>q.type!=="upload").map(([id,q])=>({pergunta:q.label,resposta:fmt(answers[id])}));
+  const qa=Object.entries(questions)
+   .filter(([id,q])=>q.type!=="upload")
+   .map(([id,q])=>({pergunta:q.label,resposta:fmt(answers[id])}));
   const imgs=(await Promise.all(files.slice(0,3).map(shrink))).filter(Boolean);
-  const r=await fetch("/api/diagnostico",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({qa,imgs,accessKey:validatedAccessKey})});
-  const d=await r.json();if(!r.ok)throw new Error(d?.erro||"Não foi possível gerar o diagnóstico.");if(!d||!d.resumo)throw new Error("A resposta da IA veio incompleta.");
-  clearInterval(tm);draw(d);
- }catch(e){clearInterval(tm);$("resultPanel").innerHTML=`<div class="ld"><h2>Não conseguimos gerar agora</h2><p class="intro" style="margin:0 auto 22px">${esc(e.message||"Suas respostas continuam salvas. Tente novamente em instantes.")}</p><button class="btn primary" onclick="generate()">Tentar novamente</button></div>`;}
+  const response=await fetch("/api/diagnostico",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({qa,imgs,accessKey:validatedAccessKey})
+  });
+  const result=await readMivStream(response,loadingUi);
+  loadingUi.stop();
+  draw(result);
+ }catch(error){
+  loadingUi.stop();
+  $("resultPanel").innerHTML=
+   '<div class="ld"><h2>Não conseguimos concluir seu MIV</h2><p class="intro" style="margin:0 auto 22px">' +
+   esc(error.message||"Suas respostas continuam salvas. Sua chave será liberada se a geração não foi concluída. Tente novamente.") +
+   '</p><button class="btn primary" onclick="generate()">Tentar novamente</button></div>';
+ }
 }
 function reveal(){document.querySelectorAll(".rv").forEach(e=>e.classList.add("in"));document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%");}
 function draw(d){
