@@ -1099,6 +1099,7 @@ module.exports = async (req, res) => {
         report: record.report_json,
         answers: record.form_answers_json || {},
         progress: record.planner_progress || { completed: [] },
+        researchConsent: record.research_consent === true,
         expiresAt: expiry.toISOString(),
       });
     }
@@ -1126,6 +1127,7 @@ module.exports = async (req, res) => {
       const revokeResponse = await updateKey({
         research_consent: false,
         research_consent_at: null,
+        research_consent_revoked_at: new Date().toISOString(),
         research_snapshot_id: null,
       });
       if (!revokeResponse.ok) throw new Error("Não foi possível registrar a revogação.");
@@ -1354,7 +1356,12 @@ module.exports = async (req, res) => {
               "&status=eq.used"
             );
             if (!linkResponse.ok) {
-              console.error("Pesquisa criada, mas não foi possível vincular o controle de revogação.");
+              console.error("Pesquisa criada, mas não foi possível vincular o controle de revogação. Tentando remover o registro sem vínculo.");
+              const rollbackUrl = supabaseUrl + "/rest/v1/miv_research_snapshots?id=eq." + encodeURIComponent(snapshotId);
+              await fetch(rollbackUrl, {
+                method: "DELETE",
+                headers: { apikey: supabaseSecret, Authorization: "Bearer " + supabaseSecret },
+              }).catch(rollbackError => console.error("Falha ao remover registro de pesquisa sem vínculo:", rollbackError));
             }
           }
         }
@@ -1368,6 +1375,7 @@ module.exports = async (req, res) => {
       data: finalResult,
       expiresAt: expiresAt.toISOString(),
       progress: { completed: [] },
+      researchConsent,
     });
     res.end();
 
