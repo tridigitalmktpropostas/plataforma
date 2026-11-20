@@ -43,6 +43,33 @@ create table if not exists public.miv_research_snapshots (
 create index if not exists miv_research_snapshots_month_bucket_idx
   on public.miv_research_snapshots (month_bucket);
 
+-- Daily cleanup of individually identifiable report material after the 30-day service window.
+-- The purchase/access record remains for refunds, support and withdrawal of optional research consent.
+-- The separate opted-in research snapshot is not touched by this job.
+create extension if not exists pg_cron with schema pg_catalog;
+
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
+
+select cron.schedule(
+  'miv-expired-report-data-cleanup',
+  '0 3 * * *',
+  $miv_cleanup$
+    update public.miv_access_keys
+       set report_json = null,
+           questionnaire_json = null,
+           form_answers_json = null,
+           planner_progress = '{"completed":[]}'::jsonb
+     where access_expires_at is not null
+       and access_expires_at <= now()
+       and (
+         report_json is not null
+         or questionnaire_json is not null
+         or form_answers_json is not null
+       );
+  $miv_cleanup$
+);
+
 -- The application uses the Supabase service role on the server.
 -- The public browser client receives no direct read/write access to these tables.
 alter table public.miv_access_keys enable row level security;
@@ -60,7 +87,7 @@ comment on column public.miv_access_keys.questionnaire_json is
 comment on column public.miv_access_keys.form_answers_json is
   'Structured form answers needed to re-render the saved report.';
 comment on column public.miv_access_keys.access_expires_at is
-  'End of customer access to the saved report and planner; does not itself delete the stored record.';
+  'End of customer access to the saved report and planner; pg_cron clears individual report and questionnaire payloads after expiry.';
 comment on column public.miv_access_keys.research_consent is
   'Optional permission for use of the separate, de-identified categorical research snapshot.';
 comment on table public.miv_research_snapshots is
