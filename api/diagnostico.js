@@ -1140,15 +1140,15 @@ module.exports = async (req, res) => {
       const [catalogRows, addonRows, mivRows] = await Promise.all([
         readStoreTable(
           "miv_products",
-          "select=kiwify_product_id,slug,title,short_description,description,cover_image_url,checkout_url,access_url,access_instructions,is_published,display_order&is_published=eq.true&order=display_order.asc,title.asc"
+          "select=kiwify_product_id,slug,title,short_description,description,cover_image_url,checkout_url,access_url,access_instructions,is_published,display_order&is_published=eq.true&order=display_order.asc,title.asc&limit=100"
         ),
         readStoreTable(
           "miv_customer_purchases",
-          "select=kiwify_order_id,kiwify_product_id,product_name,purchase_status,amount,currency,purchased_at,created_at,provider_access_url&buyer_email=eq." + encodedEmail + "&order=purchased_at.desc.nullslast,created_at.desc"
+          "select=kiwify_order_id,kiwify_product_id,product_name,purchase_status,amount,currency,purchased_at,created_at,provider_access_url&buyer_email=eq." + encodedEmail + "&order=purchased_at.desc.nullslast,created_at.desc&limit=200"
         ),
         readStoreTable(
           "miv_access_keys",
-          "select=kiwify_order_id,status,created_at,generated_at&buyer_email=eq." + encodedEmail + "&order=created_at.desc"
+          "select=kiwify_order_id,status,created_at,generated_at&buyer_email=eq." + encodedEmail + "&order=created_at.desc&limit=100"
         ),
       ]);
 
