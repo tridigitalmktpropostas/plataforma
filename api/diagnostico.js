@@ -910,11 +910,36 @@ module.exports = async (req, res) => {
     ) {
       throw new Error("A primeira etapa retornou um diagnóstico incompleto. A chave será liberada para nova tentativa.");
     }
+
+    if (
+      data.leitura.length !== 6 ||
+      data.pontos_fortes.length < 4 ||
+      data.pontos_fortes.length > 6 ||
+      data.pontos_atencao.length < 4 ||
+      data.pontos_atencao.length > 6
+    ) {
+      throw new Error("A primeira etapa não completou todas as partes do diagnóstico. A chave será liberada para nova tentativa.");
+    }
+
+    const scoreKeys = ["clareza", "credibilidade", "conteudo", "conversao", "consistencia"];
+    for (const key of scoreKeys) {
+      const score = Number(data.pontuacao[key]);
+      if (!Number.isFinite(score) || score < 0 || score > 100) {
+        throw new Error("A pontuação do pilar " + key + " veio inválida. A chave será liberada para nova tentativa.");
+      }
+    }
+
+    const mirrorKeys = ["forca_natural", "ponto_atencao", "ponto_cego", "caminho_evolucao"];
+    for (const key of mirrorKeys) {
+      if (typeof data.espelho[key] !== "string" || !data.espelho[key].trim()) {
+        throw new Error("A análise pessoal ficou incompleta em " + key + ". A chave será liberada para nova tentativa.");
+      }
+    }
     return data;
   };
 
   const validateActionPlan = (data) => {
-    const requiredArrays = [
+    const arrayKeys = [
       "bios",
       "destaques",
       "posts_fixados",
@@ -923,14 +948,67 @@ module.exports = async (req, res) => {
       "planner_30_dias",
       "proximos_passos",
     ];
-    if (!data || !data.mockup || !data.posicionamento || !data.rotina_semanal) {
+
+    if (
+      !data ||
+      !data.mockup ||
+      !data.posicionamento ||
+      typeof data.rotina_semanal !== "string" ||
+      !data.rotina_semanal.trim()
+    ) {
       throw new Error("A segunda etapa retornou um plano incompleto. A chave será liberada para nova tentativa.");
     }
-    for (const key of requiredArrays) {
+
+    for (const key of arrayKeys) {
       if (!Array.isArray(data[key])) {
         throw new Error("A segunda etapa não completou " + key + ". A chave será liberada para nova tentativa.");
       }
     }
+
+    const countsValid =
+      data.bios.length === 3 &&
+      data.destaques.length >= 5 && data.destaques.length <= 6 &&
+      data.posts_fixados.length === 3 &&
+      data.ideias_posts.length === 9 &&
+      data.plano_30_dias.length === 4 &&
+      data.planner_30_dias.length === 30 &&
+      data.proximos_passos.length >= 3 && data.proximos_passos.length <= 5 &&
+      Array.isArray(data.mockup.bio_linhas) && data.mockup.bio_linhas.length === 3 &&
+      Array.isArray(data.mockup.destaques) &&
+      Array.isArray(data.mockup.posts) && data.mockup.posts.length === 9;
+
+    if (!countsValid) {
+      throw new Error("A segunda etapa não respeitou todas as quantidades obrigatórias. A chave será liberada para nova tentativa.");
+    }
+
+    if (data.bios.some((bio) => typeof bio !== "string" || bio.length > 150)) {
+      throw new Error("Uma das opções de bio ultrapassou 150 caracteres ou veio inválida. A chave será liberada para nova tentativa.");
+    }
+
+    if (data.destaques.some((item) => !item || typeof item.nome !== "string" || item.nome.length > 10)) {
+      throw new Error("Um dos destaques veio sem nome válido ou com mais de 10 caracteres. A chave será liberada para nova tentativa.");
+    }
+
+    if (data.plano_30_dias.some((week) => !Array.isArray(week.acoes) || week.acoes.length < 3 || week.acoes.length > 4)) {
+      throw new Error("Uma semana do plano macro veio com quantidade incorreta de ações. A chave será liberada para nova tentativa.");
+    }
+
+    if (data.planner_30_dias.some((item, index) => Number(item.dia) !== index + 1)) {
+      throw new Error("O planner não veio com os 30 dias na sequência correta. A chave será liberada para nova tentativa.");
+    }
+
+    const mockupHighlightsMatch =
+      data.mockup.destaques.length === data.destaques.length &&
+      data.mockup.destaques.every((item, index) =>
+        item &&
+        item.nome === data.destaques[index].nome &&
+        item.emoji === data.destaques[index].emoji
+      );
+
+    if (!mockupHighlightsMatch) {
+      throw new Error("Os destaques do mockup não correspondem aos destaques recomendados. A chave será liberada para nova tentativa.");
+    }
+
     return data;
   };
 
