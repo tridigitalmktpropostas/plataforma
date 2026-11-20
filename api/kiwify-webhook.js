@@ -100,8 +100,8 @@ module.exports = async (req, res) => {
     "";
   const resendKey = process.env.RESEND_API_KEY;
 
-  if (!supabaseUrl || !supabaseKey || !resendKey) {
-    console.error("Configuração ausente: Supabase ou Resend.");
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("Configuração ausente: Supabase.");
     return json(res, 500, { ok: false, error: "Integração não configurada." });
   }
 
@@ -147,7 +147,28 @@ module.exports = async (req, res) => {
   // Não criam outra chave MIV nem disparam uma segunda geração de diagnóstico.
   const additionalPurchasesUrl = `${supabaseUrl}/rest/v1/miv_customer_purchases`;
 
+  async function findAdditionalPurchase(orderId) {
+    const response = await fetch(
+      additionalPurchasesUrl +
+        "?kiwify_order_id=eq." + encodeURIComponent(orderId) +
+        "&select=kiwify_order_id,purchase_status&limit=1",
+      { headers }
+    );
+    const data = await response.json().catch(() => []);
+    if (!response.ok) {
+      console.error("Erro ao consultar compra adicional:", data);
+      throw new Error("Não foi possível consultar a compra adicional.");
+    }
+    return Array.isArray(data) ? data[0] || null : null;
+  }
+
   async function upsertAdditionalPurchase(payload, email, orderId, productId) {
+    const existing = await findAdditionalPurchase(orderId);
+    // Um reenvio tardio de compra aprovada não pode reativar pedido já reembolsado
+    // ou marcado como chargeback.
+    if (existing && ["refunded", "chargeback"].includes(existing.purchase_status)) {
+      return existing;
+    }
     const product = payload.Product || {};
     const commissions = payload.Commissions || {};
     const chargeAmount = Number(commissions.charge_amount);
@@ -322,6 +343,11 @@ module.exports = async (req, res) => {
         accessLookup: "email",
         productId,
       });
+    }
+
+    if (!resendKey) {
+      console.error("RESEND_API_KEY não configurada para o fluxo original do MIV.");
+      return json(res, 500, { ok: false, error: "Integração de e-mail não configurada." });
     }
 
     if (isRefund || isChargeback) {
