@@ -81,6 +81,18 @@ module.exports = async (req, res) => {
     return json(res, 400, { ok: false, error: "JSON inválido." });
   }
 
+  // Modo de teste seguro: valida assinatura e JSON, mas não cria chaves nem envia e-mails.
+  if (process.env.KIWIFY_WEBHOOK_TEST_MODE === "true") {
+    return json(res, 200, {
+      ok: true,
+      testMode: true,
+      signatureValid: true,
+      eventType: payload.webhook_event_type || null,
+      orderStatus: payload.order_status || null,
+      orderIdReceived: Boolean(payload.order_id),
+    });
+  }
+
   const supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
   const supabaseKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
