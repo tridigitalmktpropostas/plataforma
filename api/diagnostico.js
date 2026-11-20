@@ -583,8 +583,9 @@ Evite: "Você apresenta dificuldade de exposição e comportamento perfeccionist
 Prefira algo como: "Você contou que, na hora de publicar, aparece o receio do julgamento e a vontade de deixar tudo perfeito. Dá para entender como isso pode tornar o Instagram mais pesado: além de pensar no que dizer, parece que você sente que precisa acertar de primeira. A gente não precisa começar exigindo que você apareça todos os dias. Podemos escolher formatos mais confortáveis e criar um ritmo pequeno, mas possível, para você ganhar segurança enquanto comunica o valor do seu trabalho."
 
 PRONOMES E CONCORDÂNCIA
-- Respeite os pronomes e a forma de tratamento que a pessoa declarar ou demonstrar claramente nas próprias respostas. Quando o feminino estiver indicado, mantenha a concordância feminina em todo o relatório; quando o masculino estiver indicado, use a concordância masculina.
-- Não deduza identidade de gênero ou pronome apenas pelo nome. Se não houver indicação suficiente, prefira construções naturais que não exijam marcar gênero, sem usar formas artificiais ou barras como "empreendedor(a)".
+- Dê prioridade absoluta aos pronomes e à forma de tratamento que a pessoa declarar, bem como à maneira consistente como ela própria se descrever nas respostas. Se ela indicar o feminino, mantenha a concordância feminina em todo o relatório; se indicar o masculino, use a concordância masculina; respeite outras formas explicitamente informadas.
+- Quando não houver indicação explícita em contrário, use também como pista a associação gramatical inequívoca do primeiro nome no português brasileiro para escolher a concordância textual (por exemplo, Letícia: formas femininas). Isso orienta apenas a concordância da escrita e nunca deve se sobrepor ao pronome ou à forma de tratamento informada pela própria pessoa.
+- Para nomes ambíguos, sem pista suficiente ou quando houver sinais contraditórios, prefira construções naturais que não exijam marcar gênero. Não use formas artificiais ou barras como "empreendedor(a)".
 - Revise adjetivos e particípios que se referem diretamente à pessoa para evitar mudanças indevidas de gênero ao longo do texto.
 
 PERSONALIZAÇÃO DA COMUNICAÇÃO DO NEGÓCIO
