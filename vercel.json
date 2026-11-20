@@ -4,5 +4,15 @@
     "api/diagnostico.js": {
       "maxDuration": 300
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/venda",
+      "destination": "/vendas.html"
+    },
+    {
+      "source": "/vendas",
+      "destination": "/vendas.html"
+    }
+  ]
 }
