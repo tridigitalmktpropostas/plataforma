@@ -227,6 +227,57 @@ const fmt=v=>Array.isArray(v)?v.join(", "):(v&&typeof v==="object")?Object.entri
 const sec=(t,sub,b)=>`<section class="sec rv"><h3>${t}</h3>${sub?`<p class="sub">${sub}</p>`:""}${b}</section>`;
 const li=a=>L(a).map(x=>`<li>${esc(x)}</li>`).join("");
 function shrink(f){return new Promise(r=>{const i=new Image();i.onload=()=>{const s=Math.min(1,1280/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);r(c.toDataURL("image/jpeg",.8))};i.onerror=()=>r(null);i.src=URL.createObjectURL(f)})}
+function renderMivDiagnosisPreview(data){
+ const labels={
+  clareza:"Clareza",
+  credibilidade:"Credibilidade",
+  conteudo:"Conteúdo",
+  conversao:"Conversão",
+  consistencia:"Consistência"
+ };
+ const scores=data.pontuacao||{};
+ const scoreMarkup=Object.keys(labels).map(key=>{
+  const value=Math.max(0,Math.min(100,Number(scores[key])||0));
+  return '<div style="padding:12px;border:1px solid #eee6f3;border-radius:13px;background:#fff">' +
+   '<div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:800"><span>'+labels[key]+'</span><strong style="color:#7042ab">'+value+'/100</strong></div>' +
+   '<div style="height:6px;margin-top:9px;border-radius:20px;background:#eee8f4;overflow:hidden"><div style="height:100%;width:'+value+'%;border-radius:20px;background:linear-gradient(90deg,#8246c9,#d94b91)"></div></div>' +
+  '</div>';
+ }).join("");
+ const reading=(Array.isArray(data.leitura)?data.leitura:[]).map((item,index)=>
+  '<p style="margin:0 0 13px;color:#5f586b;font-size:12px;line-height:1.7"><b style="color:#7042ab">0'+(index+1)+'. </b>'+esc(item)+'</p>'
+ ).join("");
+ const mirror=data.espelho||{};
+ const mirrorItems=[
+  ["Sua força natural",mirror.forca_natural],
+  ["Ponto de atenção",mirror.ponto_atencao],
+  ["Ponto cego",mirror.ponto_cego],
+  ["Caminho de evolução",mirror.caminho_evolucao]
+ ];
+ const mirrorMarkup=mirrorItems.map(item=>
+  '<div style="padding:13px;border:1px solid #eee6f3;border-radius:13px;background:#fff"><div style="margin-bottom:6px;color:#8e69b3;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase">'+esc(item[0])+'</div><div style="color:#5f586b;font-size:11px;line-height:1.6">'+esc(item[1]||"Não foi possível identificar com segurança.")+'</div></div>'
+ ).join("");
+ const strong=(Array.isArray(data.pontos_fortes)?data.pontos_fortes:[]).map(item=>'<li style="margin:0 0 7px;color:#5f586b;font-size:11px;line-height:1.5">'+esc(item)+'</li>').join("");
+ const attention=(Array.isArray(data.pontos_atencao)?data.pontos_atencao:[]).map(item=>
+  '<div style="padding:11px 0;border-bottom:1px solid #eee8f3"><b style="display:block;color:#453452;font-size:11px;margin-bottom:4px">'+esc(item.titulo)+'</b><span style="color:#706879;font-size:10px;line-height:1.55">'+esc(item.explicacao)+'</span></div>'
+ ).join("");
+ return '<div style="max-width:900px;margin:0 auto 30px;padding:24px 18px;border:1px solid #e8dff0;border-radius:20px;background:linear-gradient(145deg,#fff,#faf6fd);box-shadow:0 12px 35px rgba(54,31,78,.07)">' +
+  '<div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;color:#28845f;font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase"><span>✓</span> Diagnóstico da etapa 1 concluído</div>' +
+  '<h2 style="margin:0 0 10px;font-size:clamp(22px,3vw,29px);line-height:1.15;color:#2c203c">O que a análise identificou</h2>' +
+  '<p style="margin:0 0 20px;color:#5f586b;font-size:13px;line-height:1.7">'+esc(data.resumo||"")+'</p>' +
+  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">Mapa dos cinco pilares</div>' +
+  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:22px">'+scoreMarkup+'</div>' +
+  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">Leitura estratégica</div>' +
+  '<div style="padding:15px;border:1px solid #eee6f3;border-radius:14px;background:#fff;margin-bottom:19px">'+reading+'</div>' +
+  '<div style="margin-bottom:9px;color:#8e69b3;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase">O espelho do seu posicionamento</div>' +
+  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-bottom:19px">'+mirrorMarkup+'</div>' +
+  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">' +
+   '<div style="padding:14px;border:1px solid #dcefe5;border-radius:14px;background:#f8fcf9"><b style="display:block;margin-bottom:8px;color:#287b59;font-size:11px">Pontos fortes</b><ul style="padding-left:17px;margin:0">'+strong+'</ul></div>' +
+   '<div style="padding:14px;border:1px solid #f1e2d6;border-radius:14px;background:#fffaf6"><b style="display:block;margin-bottom:4px;color:#9e663b;font-size:11px">Pontos de atenção</b>'+attention+'</div>' +
+  '</div>' +
+  '<p style="margin:17px 0 0;color:#8f849a;font-size:10px;text-align:center">A segunda etapa está transformando este diagnóstico em recomendações, conteúdos, planner e mockup.</p>' +
+ '</div>';
+}
+
 function loading(){
  const messagesByPhase={
   1:[
@@ -254,7 +305,8 @@ function loading(){
     '<span id="ldstep1" style="color:#7042ab">● 1. Diagnóstico</span><span id="ldstep2">○ 2. Plano de ação</span>' +
    '</div>' +
    '<p style="max-width:480px;margin:24px auto 0;color:#92899b;font-size:11px">O processo tem duas análises completas. Ao terminar a primeira, a segunda começa automaticamente. Não feche esta página.</p>' +
-  '</div>';
+  '</div>' +
+  '<div id="diagnosticPreview" style="padding:0 12px"></div>';
  let phase=1;
  let progress=4;
  let messageIndex=0;
@@ -285,6 +337,10 @@ function loading(){
   }
  },1800);
  return {
+  showDiagnostic(data){
+   const target=$("diagnosticPreview");
+   if(target)target.innerHTML=renderMivDiagnosisPreview(data);
+  },
   update(event){
    if(!event||event.type!=="progress")return;
    if(event.phase===2&&phase!==2){
@@ -331,6 +387,8 @@ async function readMivStream(response, loadingUi){
   catch(error){throw new Error("Recebemos uma atualização inválida do servidor. Tente novamente.");}
   if(event.type==="progress"){
    loadingUi.update(event);
+  }else if(event.type==="diagnostic"){
+   loadingUi.showDiagnostic(event.data);
   }else if(event.type==="result"){
    finalResult=event.data;
   }else if(event.type==="error"){
@@ -389,10 +447,12 @@ async function generate(){
   draw(result);
  }catch(error){
   loadingUi.stop();
+  const diagnosisPreview=$("diagnosticPreview")?$("diagnosticPreview").innerHTML:"";
   $("resultPanel").innerHTML=
    '<div class="ld"><h2>Não conseguimos concluir seu MIV</h2><p class="intro" style="margin:0 auto 22px">' +
    esc(error.message||"Suas respostas continuam salvas. Sua chave será liberada se a geração não foi concluída. Tente novamente.") +
-   '</p><button class="btn primary" onclick="generate()">Tentar novamente</button></div>';
+   '</p><button class="btn primary" onclick="generate()">Tentar novamente</button></div>' +
+   (diagnosisPreview?'<div style="padding:0 12px">'+diagnosisPreview+'</div>':"");
  }
 }
 function reveal(){document.querySelectorAll(".rv").forEach(e=>e.classList.add("in"));document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%");}
