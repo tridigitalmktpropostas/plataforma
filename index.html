@@ -281,8 +281,7 @@ function loading(){
   if(messages.length){
    messageIndex=(messageIndex+1)%messages.length;
    const msg=$("ldmsg");
-   if(msg&&messageIndex===0)msg.textContent=messages[0];
-   else if(msg&&Math.random()<.22)msg.textContent=messages[messageIndex];
+   if(msg)msg.textContent=messages[messageIndex];
   }
  },1800);
  return {
