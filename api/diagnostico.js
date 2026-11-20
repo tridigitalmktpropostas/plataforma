@@ -1103,6 +1103,35 @@ module.exports = async (req, res) => {
       });
     }
 
+    if (action === "revoke_research") {
+      const record = await fetchAccessRecord("status,research_consent,research_snapshot_id");
+      if (!record || !["used", "available"].includes(record.status)) {
+        return res.status(401).json({ revoked: false, erro: "Não foi possível localizar seu registro." });
+      }
+      if (record.research_snapshot_id) {
+        const deleteUrl = supabaseUrl + "/rest/v1/miv_research_snapshots?id=eq." +
+          encodeURIComponent(record.research_snapshot_id);
+        const deleteResponse = await fetch(deleteUrl, {
+          method: "DELETE",
+          headers: {
+            apikey: supabaseSecret,
+            Authorization: "Bearer " + supabaseSecret,
+          },
+        });
+        if (!deleteResponse.ok) {
+          console.error("Erro ao remover registro de pesquisa:", await deleteResponse.text().catch(()=>""));
+          throw new Error("Não foi possível remover os dados da pesquisa agora.");
+        }
+      }
+      const revokeResponse = await updateKey({
+        research_consent: false,
+        research_consent_at: null,
+        research_snapshot_id: null,
+      });
+      if (!revokeResponse.ok) throw new Error("Não foi possível registrar a revogação.");
+      return res.status(200).json({ revoked: true });
+    }
+
     if (action === "save_progress") {
       const record = await fetchAccessRecord("status,report_json,access_expires_at");
       if (!record || record.status !== "used" || !record.report_json) {
@@ -1311,11 +1340,23 @@ module.exports = async (req, res) => {
       try {
         const researchResponse = await fetch(supabaseUrl + "/rest/v1/miv_research_snapshots", {
           method: "POST",
-          headers: { ...supabaseHeaders(), Prefer: "return=minimal" },
+          headers: { ...supabaseHeaders(), Prefer: "return=representation" },
           body: JSON.stringify(researchRow),
         });
         if (!researchResponse.ok) {
           console.error("Relatório salvo, mas pesquisa opcional não foi registrada:", await researchResponse.text().catch(()=>""));
+        } else {
+          const researchRecords = await researchResponse.json().catch(() => []);
+          const snapshotId = Array.isArray(researchRecords) ? researchRecords[0]?.id : null;
+          if (snapshotId) {
+            const linkResponse = await updateKey(
+              { research_snapshot_id: snapshotId },
+              "&status=eq.used"
+            );
+            if (!linkResponse.ok) {
+              console.error("Pesquisa criada, mas não foi possível vincular o controle de revogação.");
+            }
+          }
         }
       } catch (researchError) {
         console.error("Relatório salvo, mas pesquisa opcional falhou:", researchError);
