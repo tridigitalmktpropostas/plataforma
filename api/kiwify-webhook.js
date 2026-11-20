@@ -174,6 +174,9 @@ module.exports = async (req, res) => {
           amount,
           currency: String(commissions.currency || "").slice(0, 3) || null,
           purchased_at: purchaseDate,
+          provider_access_url: /^https:\/\//i.test(String(payload.access_url || "").trim())
+            ? String(payload.access_url).trim().slice(0, 2048)
+            : null,
           updated_at: new Date().toISOString(),
         }),
       }
