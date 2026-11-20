@@ -61,7 +61,7 @@ on conflict (kiwify_product_id) do update set
   updated_at = now();
 ```
 
-O produto fica registrado com `is_published = false`: assim, o webhook já consegue reconhecer seu ID antes da primeira compra quando a variável `KIWIFY_PRODUCT_ID` não estiver configurada, mas o produto ainda não aparece na vitrine.
+O produto fica registrado com `is_published = false`: assim, o webhook já consegue reconhecer seu ID antes da primeira compra sem exibir a oferta na vitrine. **Cadastre sempre o ID antes de ativar o webhook/venda.** Quando `KIWIFY_PRODUCT_ID` estiver configurado na Vercel, um produto diferente do MIV só é registrado se já estiver no catálogo; o evento não reconhecido é ignorado para não criar uma chave MIV por engano. Se `KIWIFY_PRODUCT_ID` não estiver configurado, o catálogo é usado para distinguir os produtos adicionais do fluxo original do MIV.
 
 ## 2. Configurar o webhook da Kiwify
 
