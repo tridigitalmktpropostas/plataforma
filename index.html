@@ -65,6 +65,49 @@ footer{max-width:1100px;margin:0 auto 35px;padding:0 22px;color:var(--muted);fon
 @media(max-width:650px){.availrow{grid-template-columns:1fr 1fr}.availday{grid-column:1/-1}.calendar{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.two,.grid3,.plan{grid-template-columns:1fr}}
 .consent-card{margin-top:22px;padding:18px;border:1px solid #e5d9ed;border-radius:15px;background:#fbf7fd}.consent-card h3{margin:0 0 8px;font-size:16px}.consent-item{display:flex;align-items:flex-start;gap:10px;margin:12px 0;font-size:13px;line-height:1.55}.consent-item input{margin-top:4px;accent-color:#8246c9;flex:none}.consent-item a{color:#7042ab;font-weight:800}.consent-muted{font-size:11px;color:var(--muted);margin:5px 0 0}
+/* Área do cliente MIV */
+.client-area{display:flex;flex-direction:column;gap:18px}
+.client-welcome{display:flex;align-items:stretch;justify-content:space-between;gap:18px;padding:24px;border-radius:20px;background:linear-gradient(125deg,#713bb5 0%,#c9439a 62%,#f28b52 100%);color:#fff;box-shadow:0 12px 30px rgba(111,58,174,.16)}
+.client-welcome-main{min-width:0;flex:1}
+.client-kicker{display:inline-block;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.82)}
+.client-welcome h2{margin:8px 0 7px;color:#fff;font-size:clamp(23px,4vw,32px);line-height:1.12}
+.client-welcome p{margin:0;max-width:620px;color:rgba(255,255,255,.9);font-size:13px;line-height:1.55}
+.client-profile-card{display:flex;align-items:center;gap:10px;align-self:flex-start;padding:10px 12px;border:1px solid rgba(255,255,255,.3);border-radius:15px;background:rgba(255,255,255,.14);min-width:190px}
+.client-avatar{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:50%;background:#fff;color:#8644b5;font-weight:900;font-size:17px}
+.client-profile-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.client-profile-info strong{font-size:12px;color:#fff;overflow-wrap:anywhere}
+.client-profile-info small{font-size:10px;color:rgba(255,255,255,.84);overflow-wrap:anywhere}
+.client-logout{align-self:flex-start;white-space:nowrap;border:1px solid rgba(255,255,255,.55);background:transparent;color:#fff;padding:9px 12px;border-radius:11px;font-weight:800;font-size:11px;cursor:pointer}
+.client-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:6px;border:1px solid #ece5f2;border-radius:15px;background:#f8f5fa}
+.client-tab{min-width:0;border:0;border-radius:11px;background:transparent;padding:12px 8px;color:#777083;font:inherit;font-size:12px;font-weight:800;cursor:pointer;line-height:1.25}
+.client-tab[aria-selected="true"]{background:#fff;color:#7943b2;box-shadow:0 3px 12px rgba(49,31,66,.09)}
+.client-pane{min-width:0}
+.client-pane[hidden]{display:none!important}
+.client-pane .actions{margin-top:22px}
+.client-pane .resultbox{margin-top:0}
+.planner-overview{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr);gap:14px;align-items:stretch;margin:0 0 20px}
+.planner-welcome-card,.planner-progress-card{padding:20px;border:1px solid #ece5f2;border-radius:16px;background:#fff}
+.planner-welcome-card .tag{color:#8548ba}
+.planner-welcome-card h3{margin:8px 0;font-size:21px;color:#2b2437}
+.planner-welcome-card p{margin:0;color:#716a7b;font-size:13px;line-height:1.6}
+.planner-progress-card{display:flex;flex-direction:column;justify-content:center;gap:12px;background:#fbf8fd}
+.planner-progress-card strong{font-size:14px;color:#342b43}
+.planner-progress-card small{font-size:11px;color:#81788b}
+.planner-progress-track{height:9px;overflow:hidden;border-radius:99px;background:#ece5f2}
+.planner-progress-fill{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#8246c9,#dc4b95,#f18b56);transition:width .2s ease}
+.client-planner .calendar{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.client-planner .calday{min-height:0;padding:13px;border-radius:13px}
+.client-planner .calday p{line-height:1.5}
+.client-products{padding:24px;border:1px solid #ece5f2;border-radius:18px;background:linear-gradient(145deg,#fff,#fbf7fd)}
+.client-products h3{margin:8px 0;font-size:24px;color:#2b2437}
+.client-products>p{max-width:650px;color:#70687b;font-size:14px;line-height:1.65}
+.client-product-coming{margin-top:18px;padding:22px;border:1px dashed #d9c9e8;border-radius:15px;background:#fff}
+.client-product-coming .tag{display:inline-block;padding:6px 9px;border-radius:99px;background:#f4eafa;color:#7d48ad;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.client-product-coming h4{margin:12px 0 6px;font-size:17px;color:#332b40}
+.client-product-coming p{margin:0;color:#777082;font-size:13px;line-height:1.6}
+@media(max-width:760px){.client-welcome{flex-direction:column;padding:20px}.client-profile-card{align-self:stretch}.client-logout{align-self:flex-start}.planner-overview{grid-template-columns:1fr}.client-planner .calendar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.client-tabs{gap:4px;padding:4px}.client-tab{padding:11px 4px;font-size:10px}.client-planner .calendar{grid-template-columns:1fr}.client-welcome h2{font-size:25px}.client-products{padding:18px}}
+@media print{.client-welcome,.client-tabs{display:none!important}.client-pane[hidden]{display:block!important}.client-pane:not(#clientReportPane){display:none!important}}
 @media print{.top,.hero,footer,.actions,.side{display:none!important}body{background:#fff}.layout{display:block}.panel{box-shadow:none;border:0;padding:0}.rv{opacity:1!important;transform:none!important}.tile{opacity:1!important;animation:none!important}.sb i{transition:none}.sec h3{break-after:avoid}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
@@ -200,7 +243,7 @@ function render(){
    <section class="consent-card">
     <h3>Privacidade e uso das informações</h3>
     <p class="consent-muted">Leia como suas informações serão utilizadas para entregar e manter seu acompanhamento.</p>
-    <label class="consent-item"><input id="privacyAck" type="checkbox" required> <span>Li o <a href="/politica-de-privacidade.html" target="_blank" rel="noopener">Aviso de Privacidade</a> e estou ciente de que minhas respostas, diagnóstico e progresso serão armazenados para disponibilizar meu MIV e o acompanhamento por 30 dias.</span></label>
+    <label class="consent-item"><input id="privacyAck" type="checkbox" required> <span>Li o <a href="/politica-de-privacidade.html" target="_blank" rel="noopener">Aviso de Privacidade</a> e estou ciente de que minhas respostas, diagnóstico e progresso serão armazenados para disponibilizar minha área do cliente, sem prazo de expiração previamente definido, conforme o aviso.</span></label>
     <label class="consent-item"><input id="researchConsent" type="checkbox"> <span><strong>Opcional:</strong> autorizo a Tri Digital a utilizar informações estruturadas e desidentificadas, sem identificadores diretos, do diagnóstico em análises internas sobre negócios e marketing. Esta escolha não altera meu acesso ao MIV e pode ser revogada pelo canal indicado no aviso.</span></label>
    </section>` : "");
  $("backBtn").style.visibility=step===0?"hidden":"visible";$("nextBtn").textContent=step===groups.length-1?"Gerar meu diagnóstico →":"Continuar →";
@@ -498,7 +541,7 @@ async function generate(){
  }
 }
 async function downloadMivPdf(){
- const button=$("downloadPdfBtn"),target=$("resultPanel");
+ const button=$("downloadPdfBtn"),target=$("clientReportPane");
  if(button){button.disabled=true;button.textContent="Preparando PDF…";}
  reveal();
  try{
@@ -562,6 +605,23 @@ async function savePlannerProgress(completed){
  });
  return plannerSaveQueue;
 }
+function switchClientTab(tab){
+ const allowed=["report","planner","products"];
+ if(!allowed.includes(tab))return;
+ document.querySelectorAll("[data-client-tab]").forEach(button=>{
+  const selected=button.dataset.clientTab===tab;
+  button.setAttribute("aria-selected",selected?"true":"false");
+  button.tabIndex=selected?0:-1;
+ });
+ document.querySelectorAll("[data-client-pane]").forEach(pane=>{
+  pane.hidden=pane.dataset.clientPane!==tab;
+ });
+ if(tab==="planner"){
+  document.querySelectorAll("#clientPlannerPane .rv").forEach(el=>el.classList.add("in"));
+  document.querySelectorAll("#clientPlannerPane [data-w]").forEach(el=>el.style.width=el.dataset.w+"%");
+ }
+ scrollTo({top:0,behavior:"smooth"});
+}
 function draw(d,session={}){
  const plannerProgress=session.progress||{completed:[]};
  activeAccessExpiresAt=session.expiresAt||null;
@@ -570,7 +630,7 @@ function draw(d,session={}){
  const lb={clareza:"Clareza",credibilidade:"Credibilidade",conteudo:"Conteúdo",conversao:"Conversão",consistencia:"Consistência"};
  const grads=["#7b42c8,#d94b91","#d94b91,#f6a044","#26213b,#8246c9","#f6a044,#d94b91","#8246c9,#26213b","#d94b91,#7b42c8"];
  let h=`<div class="eyebrow" style="color:#9b42c6">MIV · MÍNIMO INSTAGRAM VIÁVEL · DIAGNÓSTICO ESTRATÉGICO</div><h2 class="rv">Diagnóstico de ${esc(name)}</h2><p class="intro rv">${esc(d.resumo)}</p>`;
- if(activeAccessExpiresAt){const expiryText=new Date(activeAccessExpiresAt).toLocaleDateString("pt-BR");h+=`<div class="resultbox"><strong>Seu acompanhamento está ativo até ${esc(expiryText)}.</strong><p>Suas marcações do planner ficam salvas durante esse período.</p></div>`;}
+
  if(hasResearchConsent){h+=`<div class="resultbox" id="researchConsentStatus"><strong>Autorização de pesquisa ativa</strong><p>Você autorizou o uso de informações categóricas sem identificadores diretos em análises internas da Tri Digital. Essa autorização é opcional.</p><button class="btn secondary" type="button" onclick="revokeResearchConsent()">Revogar autorização de pesquisa</button></div>`;}
  h+=sec("Mapa do seu perfil","Uma leitura de 0 a 100 sobre o quanto cada área está organizada hoje. Não é uma previsão de resultado.",`<div class="scores">${Object.keys(lb).map(k=>`<div><div class="sl"><span>${lb[k]}</span><b>${N(sc[k])}</b></div><div class="sb"><i data-w="${N(sc[k])}"></i></div></div>`).join("")}</div>`);
  h+=sec("Nossa leitura estratégica","",`<div class="leit">${P(d.leitura)}</div>`);
@@ -582,16 +642,48 @@ function draw(d,session={}){
  h+=sec("Destaques sugeridos","A vitrine do seu perfil: o que a pessoa precisa encontrar sem precisar perguntar.",`<div class="grid3">${L(d.destaques).map(x=>`<div class="card"><div class="em">${esc(x.emoji)}</div><h4>${esc(x.nome)}</h4><p>${esc(x.conteudo)}</p></div>`).join("")}</div>`);
  h+=sec("3 publicações para fixar no topo","Os primeiros conteúdos que quem chega ao seu perfil vai ver.",`<div class="grid3">${L(d.posts_fixados).map((x,i)=>`<div class="card"><span class="tag">📌 Fixado ${i+1} · ${esc(x.formato)}</span><h4>${esc(x.titulo)}</h4><p>${esc(x.ideia)}</p><p class="cap">${esc(x.legenda)}</p></div>`).join("")}</div>`);
  h+=sec("Ideias de posts","",`<div class="grid3">${L(d.ideias_posts).map(x=>`<div class="card"><span class="tag">${esc(x.formato)}</span><h4>${esc(x.titulo)}</h4><p>${esc(x.ideia)}</p><small>Objetivo: ${esc(x.objetivo)}</small></div>`).join("")}</div>`);
- h+=sec("Estratégia das quatro semanas","Visão geral do que será construído ao longo do mês.",`<div class="plan">${L(d.plano_30_dias).map(x=>`<div class="card"><span class="tag">${esc(x.semana)}</span><h4>${esc(x.foco)}</h4><ul>${li(x.acoes)}</ul></div>`).join("")}</div><p>${esc(d.rotina_semanal)}</p>`);
  const planner=L(d.planner_30_dias);
  const dayNames=["Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado","Domingo"];
- h+=sec("Seu calendário de execução · 30 dias","As tarefas e os horários abaixo devem respeitar a disponibilidade que você informou. Marque cada atividade quando concluir.",`<div class="calendar">${planner.map((x,i)=>{const dn=x.dia_semana||dayNames[i%7];return `<div class="calday" data-plan-card="${i}"><strong>Dia ${esc(x.dia??i+1)} · ${esc(dn)}</strong><p>${esc(x.tarefa||"Atividade não especificada")}</p><small>⏰ ${esc(x.horario||"A combinar")} · ${esc(x.duracao||"Duração não informada")}</small><small class="tag">${esc(x.pilar||"Planejamento")}</small><label class="calcheck"><input type="checkbox" data-planner-check="${i}"> Concluído</label></div>`}).join("")}</div><p class="smallprint">O ciclo do planner começa na segunda-feira. Se sua data de início for diferente, use a sequência de dias como referência e ajuste o calendário à sua semana.</p>`);
+ const plannerTotal=planner.length||30;
+ const completedSet=new Set((plannerProgress.completed||[]).map(Number).filter(n=>Number.isInteger(n)&&n>=0&&n<plannerTotal));
+ let plannerHtml=`<div class="planner-overview">
+  <div class="planner-welcome-card"><span class="tag">SEU PLANO DE EXECUÇÃO</span><h3>30 dias de ação, no seu ritmo.</h3><p>Este é o seu espaço de acompanhamento. Consulte cada tarefa, veja o direcionamento e marque o que concluir. Seu progresso fica salvo junto ao seu acesso.</p></div>
+  <div class="planner-progress-card"><strong id="plannerProgressLabel">${completedSet.size} de ${plannerTotal} tarefas concluídas</strong><div class="planner-progress-track"><span class="planner-progress-fill" id="plannerProgressFill" style="width:${Math.round(completedSet.size/plannerTotal*100)}%"></span></div><small>Seu avanço é atualizado conforme você conclui as atividades.</small></div>
+ </div>`;
+ plannerHtml+=sec("Estratégia das quatro semanas","Visão geral do que será construído ao longo do mês.",`<div class="plan">${L(d.plano_30_dias).map(x=>`<div class="card"><span class="tag">${esc(x.semana)}</span><h4>${esc(x.foco)}</h4><ul>${li(x.acoes)}</ul></div>`).join("")}</div><p>${esc(d.rotina_semanal)}</p>`);
+ plannerHtml+=sec("Seu calendário de execução · 30 dias","As tarefas e os horários abaixo devem respeitar a disponibilidade que você informou. Marque cada atividade quando concluir.",`<div class="calendar">${planner.map((x,i)=>{const dn=x.dia_semana||dayNames[i%7];return `<div class="calday" data-plan-card="${i}"><strong>Dia ${esc(x.dia??i+1)} · ${esc(dn)}</strong><p>${esc(x.tarefa||"Atividade não especificada")}</p><small>⏰ ${esc(x.horario||"A combinar")} · ${esc(x.duracao||"Duração não informada")}</small><small class="tag">${esc(x.pilar||"Planejamento")}</small><label class="calcheck"><input type="checkbox" data-planner-check="${i}"> Concluído</label></div>`}).join("")}</div><p class="smallprint">O ciclo do planner começa na segunda-feira. Use os 30 dias como sequência de execução e ajuste o início à sua rotina.</p>`);
 
  h+=sec("Como seu perfil pode ficar","Exemplo ilustrativo com o que foi sugerido neste diagnóstico.",`<div class="phone"><div class="ighd">${esc(handle)}</div><div class="igh"><div class="av"><span>${esc((m.nome_exibicao||name).charAt(0).toUpperCase())}</span></div><div class="st"><b>9</b><small>publicações</small></div><div class="st"><b>${esc(answers[16]||0)}</b><small>seguidores</small></div></div><div class="igb"><b>${esc(m.nome_exibicao||name)}</b><br><small>${esc(m.categoria)}</small>${L(m.bio_linhas).map(x=>`<div>${esc(x)}</div>`).join("")}<span class="cta">${esc(m.botao)}</span></div><div class="hls">${L(m.destaques).slice(0,6).map(x=>`<div><i>${esc(x.emoji)}</i><small>${esc(x.nome)}</small></div>`).join("")}</div><div class="gridig">${L(m.posts).slice(0,9).map((p,i)=>`<div class="tile" style="--i:${i};background:linear-gradient(135deg,${grads[i%6]})">${i<3?"<em>📌</em>":""}<span>${esc(p.capa)}</span><small>${esc(p.formato)}</small></div>`).join("")}</div></div><p class="ex">Prévia ilustrativa. Não representa resultado garantido.</p>`);
  h+=sec("Seus próximos passos","",`<div class="card"><ul>${li(d.proximos_passos)}</ul></div><p class="smallprint">Este diagnóstico é uma orientação estratégica baseada nas informações fornecidas por você e foi gerado com apoio de inteligência artificial. Ele não garante resultados de vendas, crescimento ou engajamento.</p>`);
- h+=`<div class="actions"><button class="btn secondary" onclick="location.reload()">Sair do acompanhamento</button><button class="btn primary" id="downloadPdfBtn" onclick="downloadMivPdf()">Baixar relatório em PDF</button></div><p class="smallprint">O PDF será gerado no seu dispositivo. Em celulares, o arquivo pode aparecer nos downloads do navegador.</p>`;
- $("resultPanel").innerHTML=h;
- const completedSet=new Set((plannerProgress.completed||[]).map(Number));
+ h+=`<div class="actions"><button class="btn primary" id="downloadPdfBtn" onclick="downloadMivPdf()">Baixar relatório em PDF</button></div><p class="smallprint">O PDF será gerado no seu dispositivo. Em celulares, o arquivo pode aparecer nos downloads do navegador.</p>`;
+ const initialName=name||"Seu perfil MIV";
+ const initials=(initialName.trim().charAt(0)||"M").toUpperCase();
+ const portalHtml=`<div class="client-area">
+  <header class="client-welcome">
+   <div class="client-welcome-main"><span class="client-kicker">TRI DIGITAL · MIV</span><h2>Minha área do cliente</h2><p>Olá, ${esc(initialName)}! Seu diagnóstico está salvo. Aqui você pode consultar seu relatório, acompanhar o planner e encontrar as próximas soluções da Tri Digital.</p></div>
+   <div class="client-profile-card"><div class="client-avatar">${esc(initials)}</div><div class="client-profile-info"><strong>${esc(initialName)}</strong><small>${esc(handle||"Cliente MIV")}</small></div></div>
+   <button class="client-logout" type="button" onclick="location.reload()">Sair da conta</button>
+  </header>
+  <nav class="client-tabs" aria-label="Navegação da área do cliente">
+   <button class="client-tab" type="button" data-client-tab="report" aria-selected="true" onclick="switchClientTab('report')">Meu relatório</button>
+   <button class="client-tab" type="button" data-client-tab="planner" aria-selected="false" tabindex="-1" onclick="switchClientTab('planner')">Planner 30 dias</button>
+   <button class="client-tab" type="button" data-client-tab="products" aria-selected="false" tabindex="-1" onclick="switchClientTab('products')">Outros produtos</button>
+  </nav>
+  <section class="client-pane" id="clientReportPane" data-client-pane="report">${h}</section>
+  <section class="client-pane client-planner" id="clientPlannerPane" data-client-pane="planner" hidden>${plannerHtml}</section>
+  <section class="client-pane" id="clientProductsPane" data-client-pane="products" hidden>
+   <div class="client-products"><span class="client-kicker" style="color:#8a51b2">CONTINUE SUA EVOLUÇÃO</span><h3>Outros produtos da Tri Digital</h3><p>Estamos preparando novas ferramentas, materiais e experiências para ajudar você a dar os próximos passos na organização do seu marketing.</p>
+    <div class="client-product-coming"><span class="tag">Em breve</span><h4>Novas soluções para o seu negócio</h4><p>Quando novos produtos estiverem disponíveis, você poderá conhecer os detalhes e acessar as opções de compra diretamente por esta área do cliente.</p></div>
+   </div>
+  </section>
+ </div>`;
+ $("resultPanel").innerHTML=portalHtml;
+ const updatePlannerProgressUI=()=>{
+  const done=completedSet.size;
+  const label=$("plannerProgressLabel"),fill=$("plannerProgressFill");
+  if(label)label.textContent=done+" de "+plannerTotal+" tarefas concluídas";
+  if(fill)fill.style.width=Math.round(done/plannerTotal*100)+"%";
+ };
  document.querySelectorAll("[data-planner-check]").forEach(ch=>{
   const index=Number(ch.dataset.plannerCheck);
   ch.checked=completedSet.has(index);
@@ -600,11 +692,13 @@ function draw(d,session={}){
   ch.addEventListener("change",()=>{
    if(ch.checked)completedSet.add(index);else completedSet.delete(index);
    if(card)card.classList.toggle("done",ch.checked);
+   updatePlannerProgressUI();
    savePlannerProgress([...completedSet]);
   });
  });
+ updatePlannerProgressUI();
  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");e.target.querySelectorAll("[data-w]").forEach(b=>b.style.width=b.dataset.w+"%");io.unobserve(e.target)}}),{threshold:.12});
- document.querySelectorAll(".rv").forEach(e=>io.observe(e));scrollTo(0,0);
+ document.querySelectorAll("#clientReportPane .rv").forEach(e=>io.observe(e));scrollTo(0,0);
 }
 addEventListener("beforeprint",reveal);
 
