@@ -162,11 +162,15 @@ module.exports = async (req, res) => {
     return Array.isArray(data) ? data[0] || null : null;
   }
 
-  async function upsertAdditionalPurchase(payload, email, orderId, productId) {
+  async function upsertAdditionalPurchase(payload, email, orderId, productId, purchaseStatus = "paid") {
     const existing = await findAdditionalPurchase(orderId);
     // Um reenvio tardio de compra aprovada não pode reativar pedido já reembolsado
     // ou marcado como chargeback.
-    if (existing && ["refunded", "chargeback"].includes(existing.purchase_status)) {
+    if (
+      existing &&
+      ["refunded", "chargeback"].includes(existing.purchase_status) &&
+      purchaseStatus === "paid"
+    ) {
       return existing;
     }
     const product = payload.Product || {};
@@ -191,7 +195,7 @@ module.exports = async (req, res) => {
           kiwify_order_id: orderId,
           kiwify_product_id: productId,
           product_name: String(product.product_name || "Produto digital").slice(0, 180),
-          purchase_status: "paid",
+          purchase_status: purchaseStatus,
           amount,
           currency: String(commissions.currency || "").slice(0, 3) || null,
           purchased_at: purchaseDate,
@@ -325,7 +329,12 @@ module.exports = async (req, res) => {
         return json(res, 200, { ok: true, ignored: true, reason: "Evento sem identificador de produto." });
       }
       if (isRefund || isChargeback) {
-        await updateAdditionalPurchase(orderId, isChargeback ? "chargeback" : "refunded");
+        const refundStatus = isChargeback ? "chargeback" : "refunded";
+        if (email && email.includes("@")) {
+          await upsertAdditionalPurchase(payload, email, orderId, productId, refundStatus);
+        } else {
+          await updateAdditionalPurchase(orderId, refundStatus);
+        }
         return json(res, 200, { ok: true, purchaseUpdated: true, accessRevoked: true });
       }
       if (!approved) {
