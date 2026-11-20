@@ -626,6 +626,121 @@ Se qualquer item falhar, revise o conteúdo correspondente antes de responder. P
 
 `;
 
+
+const extractPromptSection = (startHeading, endHeading) => {
+  const start = SYSTEM.indexOf(startHeading);
+  const end = endHeading ? SYSTEM.indexOf(endHeading, start) : SYSTEM.length;
+  if (start < 0 || end < 0 || end <= start) {
+    throw new Error("Não foi possível montar as instruções das etapas do MIV.");
+  }
+  return SYSTEM.slice(start, end).trim();
+};
+
+// O prompt original continua preservado. Seus blocos são distribuídos em duas tarefas especializadas.
+const CORE_INSTRUCTIONS = extractPromptSection("IDENTIDADE E MISSÃO", "METODOLOGIA MIV — CINCO PILARES");
+const METHOD_INSTRUCTIONS = extractPromptSection("METODOLOGIA MIV — CINCO PILARES", "DIRECIONAMENTO DE POSICIONAMENTO E COMUNICAÇÃO");
+const ACTION_INSTRUCTIONS = extractPromptSection("DIRECIONAMENTO DE POSICIONAMENTO E COMUNICAÇÃO", "FORMATO E QUANTIDADE — OBRIGATÓRIO");
+const QUALITY_EXTENSION = extractPromptSection("CAMADA COMPLEMENTAR DE QUALIDADE — APLICAÇÃO PRÁTICA DO MÉTODO MIV", null);
+const DIAGNOSTIC_EXTENSION = extractPromptSection("CAMADA COMPLEMENTAR DE QUALIDADE — APLICAÇÃO PRÁTICA DO MÉTODO MIV", "4. POSICIONAMENTO, PROPOSTA DE VALOR E BIO");
+
+const SYSTEM_DIAGNOSTIC = [
+  CORE_INSTRUCTIONS,
+  METHOD_INSTRUCTIONS,
+  DIAGNOSTIC_EXTENSION,
+  [
+    "ETAPA 1 DE 2 — DIAGNÓSTICO ESTRATÉGICO",
+    "",
+    "Nesta etapa, faça SOMENTE a leitura e o diagnóstico aprofundado. Não produza ainda bios, destaques, posts, plano de 30 dias, planner, rotina semanal, próximos passos ou mockup. Essas entregas serão feitas por uma segunda chamada da IA, que receberá seu diagnóstico completo.",
+    "",
+    "Cruze negócio, cliente, Instagram e pessoa. Analise os cinco pilares, atribua notas justificadas, identifique o gargalo central e construa o espelho com evidências. Use todas as respostas relevantes e os prints quando existirem.",
+    "",
+    "Retorne SOMENTE JSON válido, sem Markdown ou texto antes/depois, exatamente com esta estrutura:",
+    "{",
+    '  "resumo": "Síntese personalizada em 2 a 3 frases.",',
+    '  "pontuacao": { "clareza": 0, "credibilidade": 0, "conteudo": 0, "conversao": 0, "consistencia": 0 },',
+    '  "leitura": [',
+    '    "Parágrafo 1: contexto, oferta, público e momento do negócio.",',
+    '    "Parágrafo 2: análise profunda de Clareza.",',
+    '    "Parágrafo 3: análise de Credibilidade e Conteúdo.",',
+    '    "Parágrafo 4: análise de Conversão e jornada do cliente.",',
+    '    "Parágrafo 5: Consistência e integração com a pessoa e sua rotina.",',
+    '    "Parágrafo 6: diagnóstico central, gargalo prioritário e lógica das prioridades."',
+    "  ],",
+    '  "espelho": { "forca_natural": "Força natural com evidências concretas e implicação estratégica.", "ponto_atencao": "Padrão de atenção sustentado pelas respostas, sem julgamento.", "ponto_cego": "Conexão ainda pouco percebida entre pessoa, negócio e Instagram.", "caminho_evolucao": "Caminho prático, realista e personalizado." },',
+    '  "pontos_fortes": ["4 a 6 pontos fortes reais, específicos e explicados."],',
+    '  "pontos_atencao": [{ "titulo": "Problema específico", "explicacao": "Evidência, consequência para o cliente e recomendação prática." }]',
+    "}",
+    "",
+    "REGRAS DA ETAPA 1:",
+    '- "leitura" deve ter exatamente 6 parágrafos desenvolvidos.',
+    '- "pontos_fortes" deve conter de 4 a 6 itens.',
+    '- "pontos_atencao" deve conter de 4 a 6 objetos.',
+    '- "pontuacao" deve conter os cinco pilares com notas de 0 a 100.',
+    '- "espelho" deve preencher os quatro campos com profundidade.',
+    "- Não inclua nenhum campo da etapa 2.",
+    "- Não economize tokens a ponto de produzir frases vagas. Use a profundidade necessária para justificar o diagnóstico.",
+    "- Não repita a mesma conclusão em campos diferentes sem acrescentar interpretação.",
+    "- Se faltarem evidências, declare a limitação e não invente."
+  ].join("\n")
+].join("\n\n");
+
+const SYSTEM_ACTION_PLAN = [
+  CORE_INSTRUCTIONS,
+  METHOD_INSTRUCTIONS,
+  ACTION_INSTRUCTIONS,
+  QUALITY_EXTENSION,
+  [
+    "ETAPA 2 DE 2 — PLANO DE AÇÃO, CONTEÚDO E MOCKUP",
+    "",
+    "Você receberá as respostas completas do questionário MIV e o diagnóstico estratégico produzido na etapa 1, incluindo notas, leitura, espelho, pontos fortes e pontos de atenção.",
+    "",
+    "Sua missão agora é transformar o diagnóstico em um plano de ação executável e profundo. Não refaça nem contradiga o diagnóstico. Use-o como fundamento para cada recomendação. Se identificar conflito entre uma recomendação e os dados do questionário, prevalecem as respostas explícitas e os limites reais da pessoa.",
+    "",
+    "Nesta etapa, produza SOMENTE os campos de execução abaixo. Não repita resumo, pontuação, leitura, espelho, pontos fortes ou pontos de atenção, pois eles já foram produzidos na etapa 1.",
+    "",
+    "Retorne SOMENTE JSON válido, sem Markdown ou texto antes/depois, exatamente com esta estrutura:",
+    "{",
+    '  "posicionamento": "Frase de posicionamento clara e específica.",',
+    '  "bios": ["Bio 1 — direta e funcional, até 150 caracteres.", "Bio 2 — orientada ao diferencial comprovável, até 150 caracteres.", "Bio 3 — orientada ao próximo passo, até 150 caracteres."],',
+    '  "destaques": [{ "emoji": "emoji", "nome": "Nome curto de até 10 caracteres", "conteudo": "Função, conteúdo sugerido, ordem e dúvida que resolve." }],',
+    '  "posts_fixados": [{ "formato": "Reels, Carrossel ou Imagem", "titulo": "Título/capa específico", "ideia": "Roteiro executável com gancho, cenas/telas, desenvolvimento, exemplo e fechamento.", "legenda": "Legenda pronta, complementar ao conteúdo e com CTA coerente." }],',
+    '  "ideias_posts": [{ "formato": "Formato", "titulo": "Gancho/título", "ideia": "Desenvolvimento específico, o que mostrar/falar, exemplo e CTA. Em 2 a 4 frases.", "objetivo": "Função na jornada do cliente." }],',
+    '  "plano_30_dias": [{ "semana": "Semana 1", "foco": "Foco estratégico e resultado de organização verificável.", "acoes": ["Ação específica 1", "Ação específica 2", "Ação específica 3"] }],',
+    '  "planner_30_dias": [{ "dia": 1, "dia_semana": "Segunda-feira", "tarefa": "Tarefa objetiva, concreta e verificável.", "horario": "Intervalo dentro da disponibilidade, Livre ou Horário a combinar.", "duracao": "Duração compatível ou 0 min.", "pilar": "Clareza" }],',
+    '  "rotina_semanal": "Orientação personalizada e sustentável para manter o processo após os 30 dias.",',
+    '  "proximos_passos": ["Ação prioritária 1", "Ação prioritária 2", "Ação prioritária 3"],',
+    '  "mockup": { "nome_exibicao": "Nome de exibição recomendado.", "categoria": "Categoria sustentada pelas respostas.", "bio_linhas": ["Linha 1", "Linha 2", "Linha 3"], "botao": "CTA curto e coerente com o canal real.", "destaques": [{ "emoji": "emoji", "nome": "Nome" }], "posts": [{ "capa": "Capa curta", "formato": "Reels, Carrossel ou Foto" }] }',
+    "}",
+    "",
+    "QUANTIDADES OBRIGATÓRIAS DA ETAPA 2:",
+    "- bios: exatamente 3, cada uma com até 150 caracteres.",
+    "- destaques: 5 a 6, nomes com até 10 caracteres.",
+    "- posts_fixados: exatamente 3.",
+    "- ideias_posts: exatamente 9, diferentes dos posts fixados.",
+    "- plano_30_dias: exatamente 4 semanas, com 3 a 4 ações em cada semana.",
+    "- planner_30_dias: exatamente 30 objetos, dia 1 ao 30, sem repetição ou lacuna.",
+    "- proximos_passos: de 3 a 5.",
+    "- mockup.destaques: repetir exatamente os mesmos destaques, na mesma ordem.",
+    "- mockup.posts: exatamente 9. Os 3 primeiros correspondem aos 3 posts fixados na mesma ordem; os outros 6 correspondem a seis ideias adicionais.",
+    "- Não acrescente campos de diagnóstico da etapa 1.",
+    "",
+    "PROFUNDIDADE DA ETAPA 2:",
+    "- Cada recomendação deve derivar de uma evidência ou conclusão do diagnóstico da etapa 1.",
+    "- Cada bio deve cumprir função diferente, estar pronta para copiar e não inventar diferencial, público, local ou promessa.",
+    "- Os destaques devem funcionar como navegação lógica do perfil e resolver dúvidas reais.",
+    "- Os três fixados devem trabalhar como uma sequência: identificação, valor/solução e confiança/ação.",
+    "- Para cada fixado, diga o que aparece visualmente e o que deve ser falado ou escrito. Se a pessoa não quer aparecer, não a coloque em cena.",
+    "- As nove ideias devem cobrir funções diferentes da jornada: descoberta, educação, autoridade demonstrável, dúvidas/objeções, bastidores, relacionamento e convite à ação. Prova social só pode ser sugerida quando houver material real.",
+    "- Inclua gancho, desenvolvimento, formato, esforço de produção e CTA apropriado nas ideias, sem transformar as nove em formatos repetidos.",
+    "- O plano macro deve priorizar o gargalo principal do diagnóstico, não seguir uma sequência genérica se outra ordem for mais adequada.",
+    "- O planner deve traduzir as ações do plano em tarefas realizáveis. Use exatamente a disponibilidade informada; não invente dias ou horários e não sobrecarregue a pessoa.",
+    "- O mockup é ilustrativo e deve corresponder fielmente à melhor bio, aos mesmos destaques, ao CTA e aos conteúdos propostos.",
+    "- Não prometa vendas, seguidores, faturamento ou crescimento.",
+    "- Faça uma conferência silenciosa de coerência entre diagnóstico, bios, destaques, posts, plano, planner e mockup antes de responder."
+  ].join("\n")
+].join("\n\n");
+
+
 const pickJSON = (text) => {
   const first = text.indexOf("{");
   const last = text.lastIndexOf("}");
@@ -644,24 +759,179 @@ module.exports = async (req, res) => {
   let supabaseUrl = "";
   let supabaseSecret = "";
   let keyReserved = false;
+  let streamStarted = false;
+  let provider = "";
 
   const supabaseHeaders = () => ({
     apikey: supabaseSecret,
-    Authorization: `Bearer ${supabaseSecret}`,
+    Authorization: "Bearer " + supabaseSecret,
     "Content-Type": "application/json",
     Prefer: "return=representation",
   });
 
-  const updateKey = async (body, extraQuery = "") => {
+  const updateKey = async (body, extraQuery) => {
     const url =
-      `${supabaseUrl}/rest/v1/miv_access_keys` +
-      `?access_key=eq.${encodeURIComponent(accessKey)}${extraQuery}`;
+      supabaseUrl +
+      "/rest/v1/miv_access_keys?access_key=eq." +
+      encodeURIComponent(accessKey) +
+      (extraQuery || "");
 
     return fetch(url, {
       method: "PATCH",
       headers: supabaseHeaders(),
       body: JSON.stringify(body),
     });
+  };
+
+  const sendEvent = (event) => {
+    if (streamStarted && !res.writableEnded) {
+      res.write(JSON.stringify(event) + "\n");
+    }
+  };
+
+  const callAI = async (systemPrompt, userText, images, maxTokens, stageName) => {
+    let output = "";
+
+    if (provider === "openai") {
+      const content = [{ type: "text", text: userText }].concat(
+        (images || []).map((url) => ({
+          type: "image_url",
+          image_url: { url },
+        }))
+      );
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + process.env.OPENAI_API_KEY,
+        },
+        body: JSON.stringify({
+          model: process.env.OPENAI_MODEL || "gpt-4o",
+          max_completion_tokens: maxTokens,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: content },
+          ],
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error("Erro OpenAI na etapa " + stageName + ":", data);
+        throw new Error(
+          (data.error && data.error.message) ||
+          "Falha na etapa " + stageName + " pela OpenAI."
+        );
+      }
+
+      const choice = data.choices && data.choices[0];
+      if (choice && choice.finish_reason === "length") {
+        throw new Error(
+          "A resposta da etapa " + stageName + " atingiu o limite de geração. Tente novamente."
+        );
+      }
+      output = choice && choice.message && choice.message.content;
+      if (data.usage) {
+        console.log("MIV " + stageName + " usage:", {
+          prompt_tokens: data.usage.prompt_tokens,
+          completion_tokens: data.usage.completion_tokens,
+          total_tokens: data.usage.total_tokens,
+        });
+      }
+    } else {
+      const content = (images || []).map((url) => ({
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: "image/jpeg",
+          data: url.split(",")[1],
+        },
+      }));
+      content.push({ type: "text", text: userText });
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: "user", content: content }],
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error("Erro Anthropic na etapa " + stageName + ":", data);
+        throw new Error(
+          (data.error && data.error.message) ||
+          "Falha na etapa " + stageName + " pela Anthropic."
+        );
+      }
+
+      if (data.stop_reason === "max_tokens") {
+        throw new Error(
+          "A resposta da etapa " + stageName + " atingiu o limite de geração. Tente novamente."
+        );
+      }
+      output = (data.content || [])
+        .filter((item) => item.type === "text")
+        .map((item) => item.text)
+        .join("");
+      if (data.usage) {
+        console.log("MIV " + stageName + " usage:", {
+          input_tokens: data.usage.input_tokens,
+          output_tokens: data.usage.output_tokens,
+        });
+      }
+    }
+
+    if (!output) {
+      throw new Error("A IA retornou uma resposta vazia na etapa " + stageName + ".");
+    }
+    return pickJSON(output);
+  };
+
+  const validateDiagnostic = (data) => {
+    if (
+      !data ||
+      !data.resumo ||
+      !data.pontuacao ||
+      !Array.isArray(data.leitura) ||
+      !data.espelho ||
+      !Array.isArray(data.pontos_fortes) ||
+      !Array.isArray(data.pontos_atencao)
+    ) {
+      throw new Error("A primeira etapa retornou um diagnóstico incompleto. A chave será liberada para nova tentativa.");
+    }
+    return data;
+  };
+
+  const validateActionPlan = (data) => {
+    const requiredArrays = [
+      "bios",
+      "destaques",
+      "posts_fixados",
+      "ideias_posts",
+      "plano_30_dias",
+      "planner_30_dias",
+      "proximos_passos",
+    ];
+    if (!data || !data.mockup || !data.posicionamento || !data.rotina_semanal) {
+      throw new Error("A segunda etapa retornou um plano incompleto. A chave será liberada para nova tentativa.");
+    }
+    for (const key of requiredArrays) {
+      if (!Array.isArray(data[key])) {
+        throw new Error("A segunda etapa não completou " + key + ". A chave será liberada para nova tentativa.");
+      }
+    }
+    return data;
   };
 
   try {
@@ -673,11 +943,8 @@ module.exports = async (req, res) => {
     } = req.body || {};
 
     accessKey = String(submittedKey || "").trim();
-
     if (!accessKey) {
-      return res.status(401).json({
-        erro: "Informe sua chave de acesso.",
-      });
+      return res.status(401).json({ erro: "Informe sua chave de acesso." });
     }
 
     supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -693,64 +960,68 @@ module.exports = async (req, res) => {
       });
     }
 
-    // VALIDAÇÃO DA CHAVE: não consome nem altera o registro.
+    // A validação permanece separada da geração e não consome a chave.
     if (action === "validate") {
       const checkUrl =
-        `${supabaseUrl}/rest/v1/miv_access_keys` +
-        `?access_key=eq.${encodeURIComponent(accessKey)}` +
+        supabaseUrl +
+        "/rest/v1/miv_access_keys?access_key=eq." +
+        encodeURIComponent(accessKey) +
         "&status=eq.available&select=access_key";
 
       const checkResponse = await fetch(checkUrl, {
         method: "GET",
         headers: {
           apikey: supabaseSecret,
-          Authorization: `Bearer ${supabaseSecret}`,
+          Authorization: "Bearer " + supabaseSecret,
         },
       });
 
       const checkData = await checkResponse.json().catch(() => []);
-
       if (!checkResponse.ok) {
         console.error("Erro ao validar chave:", checkData);
         throw new Error("Não foi possível validar a chave no Supabase.");
       }
-
       if (!Array.isArray(checkData) || checkData.length === 0) {
         return res.status(401).json({
           erro: "Chave inválida, já utilizada ou indisponível.",
         });
       }
-
       return res.status(200).json({ valid: true });
     }
 
-    // Confere os dados antes de reservar a chave.
     if (!Array.isArray(qa) || qa.length > 40) {
       return res.status(400).json({ erro: "Dados inválidos" });
     }
 
-    // Reserva a chave para impedir duas gerações simultâneas.
+    provider =
+      process.env.AI_PROVIDER ||
+      (process.env.OPENAI_API_KEY ? "openai" : "anthropic");
+
+    if (provider === "openai" && !process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ erro: "OPENAI_API_KEY não configurada na Vercel." });
+    }
+    if (provider !== "openai" && !process.env.ANTHROPIC_API_KEY) {
+      return res.status(500).json({ erro: "ANTHROPIC_API_KEY não configurada na Vercel." });
+    }
+
+    // Reserva a chave uma única vez para as duas etapas.
     const reserveResponse = await updateKey(
       { status: "processing" },
       "&status=eq.available"
     );
-
     const reserveData = await reserveResponse.json().catch(() => []);
 
     if (!reserveResponse.ok) {
       console.error("Erro ao reservar chave:", reserveData);
       throw new Error("Não foi possível reservar a chave de acesso.");
     }
-
     if (!Array.isArray(reserveData) || reserveData.length === 0) {
       return res.status(401).json({
         erro: "Chave inválida, já utilizada ou indisponível.",
       });
     }
-
     keyReserved = true;
 
-    // TRATAMENTO ORIGINAL DAS RESPOSTAS
     const validQA = qa
       .filter((item) => item && typeof item.pergunta === "string")
       .map((item) => ({
@@ -772,126 +1043,66 @@ module.exports = async (req, res) => {
       validQA
         .map(
           (item, index) =>
-            `${index + 1}. PERGUNTA: ${item.pergunta}\nRESPOSTA: ${item.resposta || "Não respondida"}`
+            (index + 1) +
+            ". PERGUNTA: " + item.pergunta +
+            "\nRESPOSTA: " + (item.resposta || "Não respondida")
         )
         .join("\n\n") +
       (images.length
         ? "\n\nAs imagens anexadas são prints do Instagram atual da pessoa. Analise somente o que estiver visível e legível."
         : "\n\nA pessoa não enviou prints do Instagram. Não afirme ter observado elementos visuais do perfil.");
 
-    const provider =
-      process.env.AI_PROVIDER ||
-      (process.env.OPENAI_API_KEY ? "openai" : "anthropic");
+    // Inicia a resposta em NDJSON para comunicar a transição real entre as etapas.
+    res.status(200);
+    res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    if (typeof res.flushHeaders === "function") res.flushHeaders();
+    streamStarted = true;
 
-    let output;
+    sendEvent({
+      type: "progress",
+      phase: 1,
+      status: "started",
+      title: "Etapa 1 de 2 — Diagnóstico estratégico",
+      message: "Analisando o negócio, o cliente, o Instagram e os cinco pilares.",
+    });
 
-    // GERAÇÃO ORIGINAL PELA OPENAI
-    if (provider === "openai") {
-      if (!process.env.OPENAI_API_KEY) {
-        throw new Error("OPENAI_API_KEY não configurada na Vercel.");
-      }
+    const diagnostic = validateDiagnostic(
+      await callAI(SYSTEM_DIAGNOSTIC, texto, images, 9000, "diagnostico")
+    );
 
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: process.env.OPENAI_MODEL || "gpt-4o",
-            max_completion_tokens: 14000,
-            response_format: { type: "json_object" },
-            messages: [
-              { role: "system", content: SYSTEM },
-              {
-                role: "user",
-                content: [
-                  { type: "text", text: texto },
-                  ...images.map((url) => ({
-                    type: "image_url",
-                    image_url: { url },
-                  })),
-                ],
-              },
-            ],
-          }),
-        }
-      );
+    sendEvent({
+      type: "progress",
+      phase: 1,
+      status: "completed",
+      title: "Diagnóstico concluído",
+      message: "A análise está pronta. Agora a IA vai transformar as conclusões em conteúdo e plano de ação.",
+    });
 
-      const data = await response.json();
+    sendEvent({
+      type: "progress",
+      phase: 2,
+      status: "started",
+      title: "Etapa 2 de 2 — Plano de ação e mockup",
+      message: "Construindo bios, destaques, posts, plano de 30 dias, planner e prévia do perfil.",
+    });
 
-      if (!response.ok) {
-        console.error("Erro OpenAI:", data);
-        throw new Error(
-          data.error?.message || "Falha na geração pela OpenAI."
-        );
-      }
+    const actionPlanInput =
+      "RESPOSTAS COMPLETAS DO QUESTIONÁRIO MIV:\n\n" +
+      texto +
+      "\n\nDIAGNÓSTICO ESTRATÉGICO PRODUZIDO NA ETAPA 1:\n\n" +
+      JSON.stringify(diagnostic) +
+      "\n\nUse o diagnóstico acima como fundamento. Não altere as notas nem reescreva o diagnóstico. Produza somente as entregas da etapa 2.";
 
-      output = data.choices?.[0]?.message?.content;
+    const actionPlan = validateActionPlan(
+      await callAI(SYSTEM_ACTION_PLAN, actionPlanInput, [], 14500, "plano_de_acao")
+    );
 
-    } else {
-      // GERAÇÃO ORIGINAL PELA ANTHROPIC
-      if (!process.env.ANTHROPIC_API_KEY) {
-        throw new Error("ANTHROPIC_API_KEY não configurada na Vercel.");
-      }
+    const finalResult = Object.assign({}, diagnostic, actionPlan);
 
-      const response = await fetch(
-        "https://api.anthropic.com/v1/messages",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-          },
-          body: JSON.stringify({
-            model: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
-            max_tokens: 14000,
-            system: SYSTEM,
-            messages: [
-              {
-                role: "user",
-                content: [
-                  ...images.map((url) => ({
-                    type: "image",
-                    source: {
-                      type: "base64",
-                      media_type: "image/jpeg",
-                      data: url.split(",")[1],
-                    },
-                  })),
-                  { type: "text", text: texto },
-                ],
-              },
-            ],
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Erro Anthropic:", data);
-        throw new Error(
-          data.error?.message || "Falha na geração pela Anthropic."
-        );
-      }
-
-      output = (data.content || [])
-        .filter((item) => item.type === "text")
-        .map((item) => item.text)
-        .join("");
-    }
-
-    if (!output) {
-      throw new Error("A IA retornou uma resposta vazia.");
-    }
-
-    const result = pickJSON(output);
-
-    // Consome a chave somente depois de gerar o relatório.
+    // A chave só é consumida quando as duas etapas estão prontas.
     const consumeResponse = await updateKey(
       {
         status: "used",
@@ -899,7 +1110,6 @@ module.exports = async (req, res) => {
       },
       "&status=eq.processing"
     );
-
     const consumeData = await consumeResponse.json().catch(() => []);
 
     if (
@@ -908,25 +1118,23 @@ module.exports = async (req, res) => {
       consumeData.length === 0
     ) {
       console.error("Erro ao finalizar consumo da chave:", consumeData);
-      throw new Error(
-        "O relatório foi gerado, mas não foi possível finalizar a chave."
-      );
+      throw new Error("O relatório foi gerado, mas não foi possível finalizar a chave.");
     }
 
     keyReserved = false;
-    return res.status(200).json(result);
+    sendEvent({ type: "result", data: finalResult });
+    res.end();
 
   } catch (error) {
     console.error("Erro no diagnóstico MIV:", error);
 
-    // Se a geração falhar, devolve a chave para nova tentativa.
+    // Se qualquer etapa falhar, a chave volta a ficar disponível para uma nova tentativa.
     if (keyReserved && supabaseUrl && supabaseSecret && accessKey) {
       try {
         const releaseResponse = await updateKey(
           { status: "available", used_at: null },
           "&status=eq.processing"
         );
-
         if (!releaseResponse.ok) {
           console.error("Não foi possível liberar a chave após a falha.");
         }
@@ -935,11 +1143,22 @@ module.exports = async (req, res) => {
       }
     }
 
+    const errorMessage =
+      error && error.message
+        ? error.message
+        : "Não foi possível concluir as duas etapas do MIV. Tente novamente.";
+
+    if (streamStarted) {
+      sendEvent({ type: "error", erro: errorMessage });
+      if (!res.writableEnded) res.end();
+      return;
+    }
+
     return res.status(500).json({
       erro: "Falha ao gerar o diagnóstico",
       detalhe:
         process.env.NODE_ENV === "development"
-          ? error.message
+          ? errorMessage
           : undefined,
     });
   }
