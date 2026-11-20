@@ -1065,19 +1065,14 @@ module.exports = async (req, res) => {
 
     // Valida sem consumir: disponível inicia; usada com relatório salvo retoma.
     if (action === "validate") {
-      const record = await fetchAccessRecord("access_key,status,report_json,access_expires_at,planner_progress");
+      const record = await fetchAccessRecord("access_key,status,report_json,planner_progress");
       if (!record || ["refunded", "chargeback"].includes(record.status)) {
         return res.status(401).json({ valid: false, erro: "Chave inválida ou compra reembolsada." });
       }
       if (record.status === "available") return res.status(200).json({ valid: true, hasReport: false });
-      if (record.status === "used") {
-        const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
-        if (expiry && !Number.isNaN(expiry.getTime()) && expiry <= new Date()) {
-          return res.status(410).json({ valid: false, expired: true, erro: "Seu período de acompanhamento de 30 dias terminou." });
-        }
-        if (record.report_json && expiry && !Number.isNaN(expiry.getTime())) {
-          return res.status(200).json({ valid: true, hasReport: true, expiresAt: expiry.toISOString() });
-        }
+      if (record.status === "used" && record.report_json) {
+        // Chaves usadas só retomam o relatório existente; nunca iniciam uma nova geração.
+        return res.status(200).json({ valid: true, hasReport: true, expiresAt: null });
       }
       if (record.status === "processing") {
         return res.status(409).json({ valid: false, erro: "Seu diagnóstico ainda está sendo processado. Aguarde alguns minutos e tente novamente." });
@@ -1089,20 +1084,16 @@ module.exports = async (req, res) => {
     }
 
     if (action === "resume") {
-      const record = await fetchAccessRecord("status,report_json,form_answers_json,planner_progress,access_expires_at,research_consent");
+      const record = await fetchAccessRecord("status,report_json,form_answers_json,planner_progress,research_consent");
       if (!record || record.status !== "used" || !record.report_json) {
         return res.status(404).json({ erro: "Não encontramos um relatório salvo para esta chave." });
-      }
-      const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
-      if (!expiry || Number.isNaN(expiry.getTime()) || expiry <= new Date()) {
-        return res.status(410).json({ erro: "Seu período de acompanhamento de 30 dias terminou." });
       }
       return res.status(200).json({
         report: record.report_json,
         answers: record.form_answers_json || {},
         progress: record.planner_progress || { completed: [] },
         researchConsent: record.research_consent === true,
-        expiresAt: expiry.toISOString(),
+        expiresAt: null,
       });
     }
 
@@ -1137,13 +1128,9 @@ module.exports = async (req, res) => {
     }
 
     if (action === "save_progress") {
-      const record = await fetchAccessRecord("status,report_json,access_expires_at");
+      const record = await fetchAccessRecord("status,report_json");
       if (!record || record.status !== "used" || !record.report_json) {
         return res.status(401).json({ saved: false, erro: "Acesso indisponível." });
-      }
-      const expiry = record.access_expires_at ? new Date(record.access_expires_at) : null;
-      if (!expiry || expiry <= new Date()) {
-        return res.status(410).json({ saved: false, erro: "Seu período de acompanhamento terminou." });
       }
       const input = Array.isArray(req.body?.completed) ? req.body.completed : [];
       const completed = [...new Set(input.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n < 30))].sort((a,b)=>a-b);
@@ -1311,21 +1298,20 @@ module.exports = async (req, res) => {
 
     const finalResult = Object.assign({}, diagnostic, actionPlan);
 
-    // Salva o relatório e a data de expiração na mesma operação que consome a chave.
+    // Salva o relatório na mesma operação que consome a chave. O acesso não expira.
     const generatedAt = new Date();
-    const expiresAt = new Date(generatedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
     const researchConsent = Boolean(consent && consent.researchConsent === true);
     const persistResponse = await updateKey({
       status: "used",
       used_at: generatedAt.toISOString(),
       generated_at: generatedAt.toISOString(),
-      access_expires_at: expiresAt.toISOString(),
+      access_expires_at: null,
       report_json: finalResult,
       questionnaire_json: validQA,
       form_answers_json: safeAnswersSnapshot,
       planner_progress: { completed: [] },
       privacy_acknowledged_at: generatedAt.toISOString(),
-      privacy_notice_version: "2026-11-20-v1",
+      privacy_notice_version: "2026-11-20-v2",
       research_consent: researchConsent,
       research_consent_at: researchConsent ? generatedAt.toISOString() : null,
     }, "&status=eq.processing");
@@ -1390,7 +1376,7 @@ module.exports = async (req, res) => {
     sendEvent({
       type: "result",
       data: finalResult,
-      expiresAt: expiresAt.toISOString(),
+      expiresAt: null,
       progress: { completed: [] },
       researchConsent,
     });
