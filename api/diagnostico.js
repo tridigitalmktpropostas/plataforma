@@ -1083,19 +1083,38 @@ module.exports = async (req, res) => {
     }
 
     // Reserva a chave uma única vez para as duas etapas.
-    const reserveResponse = await updateKey(
-      { status: "processing" },
+    // used_at guarda temporariamente o início do processamento até o consumo final.
+    const reservationTime = new Date().toISOString();
+    let reserveResponse = await updateKey(
+      { status: "processing", used_at: reservationTime },
       "&status=eq.available"
     );
-    const reserveData = await reserveResponse.json().catch(() => []);
+    let reserveData = await reserveResponse.json().catch(() => []);
 
     if (!reserveResponse.ok) {
       console.error("Erro ao reservar chave:", reserveData);
       throw new Error("Não foi possível reservar a chave de acesso.");
     }
+
+    // Recupera uma reserva abandonada por uma função que tenha sido encerrada inesperadamente.
+    // O tempo de segurança é maior que o limite de execução de 5 minutos configurado na Vercel.
+    if (!Array.isArray(reserveData) || reserveData.length === 0) {
+      const staleBefore = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      reserveResponse = await updateKey(
+        { status: "processing", used_at: reservationTime },
+        "&status=eq.processing&used_at=lt." + encodeURIComponent(staleBefore)
+      );
+      reserveData = await reserveResponse.json().catch(() => []);
+
+      if (!reserveResponse.ok) {
+        console.error("Erro ao recuperar reserva expirada:", reserveData);
+        throw new Error("Não foi possível reservar a chave de acesso.");
+      }
+    }
+
     if (!Array.isArray(reserveData) || reserveData.length === 0) {
       return res.status(401).json({
-        erro: "Chave inválida, já utilizada ou indisponível.",
+        erro: "Chave inválida, já utilizada ou ainda em processamento. Aguarde alguns minutos e tente novamente.",
       });
     }
     keyReserved = true;
