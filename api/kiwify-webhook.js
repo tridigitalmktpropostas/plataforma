@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
   async function findOrder(orderId) {
     const url =
       `${tableUrl}?kiwify_order_id=eq.${encodeURIComponent(orderId)}` +
-      "&select=id,access_key,buyer_email,status,email_sent_at&limit=1";
+      "&select=id,access_key,buyer_email,status,email_sent_at,email_sending_at&limit=1";
     const response = await fetch(url, { headers });
     const data = await response.json().catch(() => []);
     if (!response.ok) {
@@ -134,6 +134,9 @@ module.exports = async (req, res) => {
     }
     return data;
   }
+
+  let claimedOrderId = "";
+  let providerAcceptedEmail = false;
 
   try {
     const payload = req.body || {};
@@ -224,17 +227,51 @@ module.exports = async (req, res) => {
       return json(res, 200, { ok: true, duplicate: true, emailAlreadySent: true });
     }
 
-    await sendAccessEmail(email, order.access_key, customer.first_name || customer.full_name);
+    // Reserva atomicamente o disparo para evitar e-mails duplicados em reenvios concorrentes.
+    // Um bloqueio abandonado pode ser retomado após 15 minutos.
+    const now = new Date();
+    const staleBefore = new Date(now.getTime() - 15 * 60 * 1000).toISOString();
+    const claimUrl =
+      `${tableUrl}?kiwify_order_id=eq.${encodeURIComponent(orderId)}` +
+      `&email_sent_at=is.null&or=(email_sending_at.is.null,email_sending_at.lt.${encodeURIComponent(staleBefore)})`;
+    const claimResponse = await fetch(claimUrl, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ email_sending_at: now.toISOString() }),
+    });
+    const claimed = await claimResponse.json().catch(() => []);
+    if (!claimResponse.ok) {
+      console.error("Erro ao reservar envio de e-mail:", claimed);
+      throw new Error("Não foi possível reservar o envio do e-mail.");
+    }
+    if (!Array.isArray(claimed) || claimed.length === 0) {
+      const latest = await findOrder(orderId);
+      if (latest?.email_sent_at) {
+        return json(res, 200, { ok: true, duplicate: true, emailAlreadySent: true });
+      }
+      return json(res, 503, { ok: false, error: "Envio já está em processamento. Tente novamente." });
+    }
+    claimedOrderId = orderId;
+
+    // Usa o e-mail gravado no primeiro registro, evitando trocar o destinatário num reenvio.
+    await sendAccessEmail(order.buyer_email || email, order.access_key, customer.first_name || customer.full_name);
+    providerAcceptedEmail = true;
 
     const sentAt = new Date().toISOString();
     await updateOrder(orderId, {
       email_sent_at: sentAt,
-      buyer_email: email,
+      email_sending_at: null,
     });
 
     return json(res, 200, { ok: true, keyCreated: true, emailSent: true });
   } catch (error) {
     console.error("Erro no webhook MIV/Kiwify:", error);
+    // Se o provedor ainda não aceitou a mensagem, libera a reserva para nova tentativa.
+    // Se aceitou, mantemos o bloqueio temporário para evitar duplicidade até reconciliação.
+    if (claimedOrderId && !providerAcceptedEmail) {
+      try { await updateOrder(claimedOrderId, { email_sending_at: null }); }
+      catch (releaseError) { console.error("Erro ao liberar reserva de e-mail:", releaseError); }
+    }
     // Resposta não-2xx para a Kiwify poder reenviar o evento.
     return json(res, 500, { ok: false, error: "Falha no processamento do webhook." });
   }
