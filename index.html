@@ -147,10 +147,28 @@ const questions={
 36:{label:"O que você sente que seus clientes precisam ouvir de você, mas às vezes evita dizer por medo de afastá-los ou parecer inconveniente?",type:"textarea",ph:"Pode ser uma orientação, um limite, uma explicação sobre preço, uma informação importante ou algo que ajudaria o cliente a decidir."},
 37:{label:"Em quais horários você costuma ter disponibilidade para cuidar do Instagram?",type:"availability",hint:"Marque os dias disponíveis e informe uma faixa de horário aproximada. Se variar muito, use o horário em que geralmente consegue se organizar."}
 };
-let step=0,answers=JSON.parse(localStorage.getItem("miv_answers")||"{}"),files=[],validatedAccessKey="";
+let step=0,answers={},files=[],validatedAccessKey="";
+function answerStorageKey(key){
+ let hashA=2166136261,hashB=0x9e3779b9;
+ for(let i=0;i<key.length;i++){
+  const code=key.charCodeAt(i);
+  hashA=Math.imul(hashA^code,16777619);
+  hashB=Math.imul(hashB^code,2246822519);
+ }
+ return "miv_answers_"+(hashA>>>0).toString(36)+"_"+(hashB>>>0).toString(36);
+}
+function loadAnswers(key){
+ try{
+  const saved=JSON.parse(localStorage.getItem(answerStorageKey(key))||"{}");
+  return saved&&typeof saved==="object"&&!Array.isArray(saved)?saved:{};
+ }catch(error){return {};}
+}
+function clearStoredAnswers(key){
+ try{localStorage.removeItem(answerStorageKey(key));}catch(error){}
+}
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function save(){localStorage.setItem("miv_answers",JSON.stringify(answers));$("saveText").textContent="Respostas salvas neste dispositivo";}
+function save(){if(!validatedAccessKey)return;localStorage.setItem(answerStorageKey(validatedAccessKey),JSON.stringify(answers));$("saveText").textContent="Respostas salvas neste dispositivo";}
 function value(id){return answers[id]??""}
 function renderNav(){
  // Navegação progressiva: as etapas são indicativas, não clicáveis.
@@ -468,6 +486,7 @@ async function generate(){
   const result=await readMivStream(response,loadingUi);
   loadingUi.stop();
   draw(result.data,result);
+  clearStoredAnswers(validatedAccessKey);
  }catch(error){
   loadingUi.stop();
   const diagnosisPreview=$("diagnosticPreview")?$("diagnosticPreview").innerHTML:"";
@@ -606,6 +625,7 @@ async function validateAccess(){
   const data=await response.json().catch(()=>({}));
   if(!response.ok||data.valid!==true)throw new Error(data.erro||"Não foi possível validar sua chave. Confira e tente novamente.");
   validatedAccessKey=key;
+  try{localStorage.removeItem("miv_answers");}catch(storageError){}
   $("accessGate").style.display="none";
   $("mainLayout").style.display="grid";
   if(data.hasReport){
@@ -617,13 +637,16 @@ async function validateAccess(){
    const resume=await resumeResponse.json().catch(()=>({}));
    if(!resumeResponse.ok||!resume.report)throw new Error(resume.erro||"Não foi possível abrir seu relatório salvo.");
    answers=resume.answers||{};
-   save();
+   clearStoredAnswers(key);
    $("formPanel").style.display="none";
    document.querySelector(".side").style.display="none";
    $("resultPanel").style.display="block";
    document.querySelector(".layout").style.display="block";
    draw(resume.report,{expiresAt:resume.expiresAt,progress:resume.progress||{completed:[]},researchConsent:resume.researchConsent===true});
   }else{
+   answers=loadAnswers(key);
+   step=0;
+   files=[];
    $("formPanel").style.display="block";
    $("resultPanel").style.display="none";
    document.querySelector(".side").style.display="";
