@@ -1214,7 +1214,7 @@ module.exports = async (req, res) => {
           kind: "miv",
           title: "MIV — Mínimo Instagram Viável",
           status: purchaseStatus,
-          purchasedAt: row.generated_at || row.created_at || null,
+          purchasedAt: row.created_at || row.generated_at || null,
           hasAccess: status === "used" && Boolean(row.generated_at),
           amount: null,
           currency: null,
