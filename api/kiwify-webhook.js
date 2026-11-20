@@ -166,11 +166,14 @@ module.exports = async (req, res) => {
     const existing = await findAdditionalPurchase(orderId);
     // Um reenvio tardio de compra aprovada não pode reativar pedido já reembolsado
     // ou marcado como chargeback.
-    if (
-      existing &&
-      ["refunded", "chargeback"].includes(existing.purchase_status) &&
-      purchaseStatus === "paid"
-    ) {
+    if (existing?.purchase_status === "chargeback") {
+      return existing;
+    }
+    if (existing && purchaseStatus !== "paid") {
+      await updateAdditionalPurchase(orderId, purchaseStatus);
+      return existing;
+    }
+    if (existing?.purchase_status === "refunded" && purchaseStatus === "paid") {
       return existing;
     }
     const product = payload.Product || {};
@@ -313,8 +316,8 @@ module.exports = async (req, res) => {
         }
         isMivProduct = false;
       } else {
-        // Sem KIWIFY_PRODUCT_ID, preserva o fluxo legado do MIV e separa
-        // produtos adicionais somente quando já constam do catálogo/ledger.
+        // Sem KIWIFY_PRODUCT_ID, preserva o fluxo legado do MIV para IDs que não
+        // constem do catálogo/ledger; IDs cadastrados são tratados como adicionais.
         isMivProduct = !isKnownAdditionalProduct;
       }
     }
