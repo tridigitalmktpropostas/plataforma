@@ -558,5 +558,45 @@ footer{padding:22px 0 98px;color:#958d9e;font-size:10px;text-align:center}
  }else{bars.forEach(function(bar){bar.style.transform="scaleX(1)"})}
 })();
 </script>
+
+<script>
+// MIV: registra o início do checkout em todos os links que levam à Kiwify.
+(function () {
+  var checkoutUrl = "https://pay.kiwify.com.br/M23mqso";
+  var navigating = false;
+
+  document.addEventListener("click", function (event) {
+    var link = event.target && event.target.closest
+      ? event.target.closest('a[href*="pay.kiwify.com.br/M23mqso"]')
+      : null;
+
+    if (!link || navigating) return;
+
+    var destination = link.href || checkoutUrl;
+    // Mantém o comportamento normal caso o Pixel não esteja disponível.
+    if (typeof window.fbq !== "function") return;
+
+    event.preventDefault();
+    navigating = true;
+
+    var finished = false;
+    function continueToCheckout() {
+      if (finished) return;
+      finished = true;
+      window.location.assign(destination);
+    }
+
+    // O callback permite o envio do evento antes de sair da página.
+    window.fbq("track", "InitiateCheckout", {}, {
+      eventCallback: continueToCheckout,
+      eventTimeout: 1200
+    });
+
+    // Segurança: nunca prende o visitante na página se o Pixel falhar.
+    window.setTimeout(continueToCheckout, 1400);
+  }, true);
+})();
+</script>
+
 </body>
 </html>
